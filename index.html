@@ -6,7 +6,6 @@
 <title>TraceTree</title>
 
 <style>
-/* Root variables and base styles */
 :root{
     --bg:#f7f7f3;
     --paper:#ffffff;
@@ -72,7 +71,6 @@ a{
     text-decoration:none;
 }
 
-/* HOME */
 .home{
     min-height:100vh;
     padding:28px;
@@ -157,10 +155,21 @@ a{
     stroke-width:4;
 }
 
-.root{fill:var(--dark);}   /* root node color */
-.verified{fill:var(--green);}   /* verified node color */
-.unverified{fill:var(--gray);}   /* unverified node color */
-.infringe{fill:var(--red);}   /* infringing node color */
+.root{
+    fill:var(--dark);
+}
+
+.verified{
+    fill:var(--green);
+}
+
+.unverified{
+    fill:var(--gray);
+}
+
+.infringe{
+    fill:var(--red);
+}
 
 .scroll-note{
     text-align:center;
@@ -169,7 +178,6 @@ a{
     padding-bottom:18px;
 }
 
-/* GUIDELINES */
 .guidelines{
     max-width:1180px;
     margin:0 auto;
@@ -213,7 +221,6 @@ a{
     font-size:14px;
 }
 
-/* EDITOR */
 .editor{
     max-width:1180px;
     margin:0 auto;
@@ -321,9 +328,17 @@ textarea{
     border-radius:50%;
 }
 
-.i-green{background:var(--green);}  /* legend green dot */
-.i-gray{background:var(--gray);}   /* legend gray dot */
-.i-red{background:var(--red);}    /* legend red dot */
+.i-green{
+    background:var(--green);
+}
+
+.i-gray{
+    background:var(--gray);
+}
+
+.i-red{
+    background:var(--red);
+}
 
 .toolbar{
     display:flex;
@@ -367,9 +382,17 @@ textarea{
     box-shadow:0 0 0 1px rgba(0,0,0,0.08);
 }
 
-.node.verified .dot{background:var(--green);}   /* verified node dot */
-.node.unverified .dot{background:var(--gray);}   /* unverified node dot */
-.node.infringe .dot{background:var(--red);}    /* infringing node dot */
+.node.verified .dot{
+    background:var(--green);
+}
+
+.node.unverified .dot{
+    background:var(--gray);
+}
+
+.node.infringe .dot{
+    background:var(--red);
+}
 
 .node-card{
     background:#fafbf8;
@@ -506,7 +529,6 @@ pre{
 
 <body>
 
-<!-- Home Section -->
 <section class="home" id="home">
 
     <nav class="nav">
@@ -573,7 +595,6 @@ pre{
 
 </section>
 
-<!-- Guidelines Section -->
 <section class="guidelines" id="guidelines">
 
     <div class="guideline-box">
@@ -583,22 +604,17 @@ pre{
 
             <div class="guide">
                 <strong>1. Create Root</strong>
-                <p>Creator verifies identity and registers the original work.</p>
+                <p>Any user can create a root by registering a unique piece of content.</p>
             </div>
 
             <div class="guide">
-                <strong>2. Request License</strong>
-                <p>Reposter submits ID, platform, link, and planned edits.</p>
+                <strong>2. Report Pirating</strong>
+                <p>Anyone may report a suspected pirated copy; it becomes a gray unverified node.</p>
             </div>
 
             <div class="guide">
-                <strong>3. Add Clue</strong>
-                <p>Anyone may submit a suspected repost as a gray node.</p>
-            </div>
-
-            <div class="guide">
-                <strong>4. Review / Report</strong>
-                <p>Creator marks nodes as authorized, infringing, or false.</p>
+                <strong>3. Review / Report</strong>
+                <p>Nodes can be authorized (green), marked as infringing (red), or dismissed as false.</p>
             </div>
 
         </div>
@@ -606,13 +622,12 @@ pre{
 
 </section>
 
-<!-- Editor Section -->
 <section class="editor" id="editor">
 
     <div class="section-head">
         <div>
             <h2>Edit a Trace Tree</h2>
-            <p>Static GitHub Pages demo. Data is saved in this browser only. Create a root node, report pirated copies, and review suspicious nodes.</p>
+            <p>Static Cloudflare Pages demo. Data is saved locally in your browser. Create a root node, report pirated copies, and review suspicious nodes.</p>
         </div>
 
         <a href="#home">
@@ -622,7 +637,6 @@ pre{
 
     <div class="grid">
 
-        <!-- Create root card accessible to all users -->
         <div class="card">
             <h3>Create Root</h3>
             <p>Any user can create a root by providing a unique piece of content.</p>
@@ -635,7 +649,6 @@ pre{
             <button onclick="createRoot()">Create Root</button>
         </div>
 
-        <!-- Report pirating card -->
         <div class="card">
             <h3>Report Pirating</h3>
             <p>Report a suspected pirated copy; becomes an unverified gray node.</p>
@@ -685,14 +698,12 @@ pre{
 </section>
 
 <div class="footer">
-    TraceTree Prototype · GitHub Pages Static Demo
+    TraceTree Prototype · Cloudflare Pages Static Demo
 </div>
 
 <script>
-// Storage key for localStorage persistence
 const STORAGE_KEY = "tracetree-static-demo-v1";
 
-// Initial state containing demo nodes
 let state = {
     title: "Trace Tree Demo",
     nodes: [
@@ -706,18 +717,6 @@ let state = {
             date: "2026-05-20",
             link: "https://example.com/original",
             note: "Original proof node.",
-            votes: 0
-        },
-        {
-            id: cryptoId(),
-            type: "verified",
-            label: "Authorized Repost",
-            badge: "Verified",
-            actor: "@MathChannel",
-            role: "Reposter",
-            date: "2026-05-21",
-            link: "https://example.com/repost",
-            note: "Approved license.",
             votes: 0
         },
         {
@@ -747,39 +746,36 @@ let state = {
     ]
 };
 
-// Generate a unique identifier
 function cryptoId(){
     return "n_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
-// Safely trim text and apply fallback
 function safeText(value, fallback){
     const clean = String(value || "").trim();
     return clean.length > 0 ? clean : fallback;
 }
 
-// Ensure valid URL starting with http or https
 function safeUrl(value, fallback){
     const clean = String(value || "").trim();
+
     if(clean.startsWith("http://") || clean.startsWith("https://")){
         return clean;
     }
+
     return fallback;
 }
 
-// Return today as YYYY-MM-DD
 function today(){
     return new Date().toISOString().slice(0,10);
 }
 
-// Save state to localStorage
 function saveState(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-// Load state from localStorage and render
 function loadState(){
     const saved = localStorage.getItem(STORAGE_KEY);
+
     if(saved){
         try{
             state = JSON.parse(saved);
@@ -787,31 +783,39 @@ function loadState(){
             localStorage.removeItem(STORAGE_KEY);
         }
     }
+
     render();
 }
 
-// Render the tree based on state
 function render(){
     document.getElementById("treeName").innerText = state.title;
+
     const tree = document.getElementById("tree");
     tree.innerHTML = "";
+
     state.nodes.forEach(node => {
         const div = document.createElement("div");
         div.className = `node ${node.type}`;
+
         const buttons = actionButtons(node);
+
         div.innerHTML = `
             <div class="dot"></div>
+
             <div class="node-card">
                 <div class="node-top">
                     <strong>${escapeHTML(node.label)}</strong>
                     <span class="badge ${node.type}">${escapeHTML(node.badge)}</span>
                 </div>
+
                 <div class="meta">
                     ${escapeHTML(node.role)}: ${escapeHTML(node.actor)} · ${escapeHTML(node.date)}
                 </div>
+
                 <a class="node-link" href="${escapeHTML(node.link)}" target="_blank">
                     ${escapeHTML(node.link)}
                 </a>
+
                 <div class="actions">
                     ${buttons}
                     <button class="secondary small" onclick="vote('${node.id}')">Vote</button>
@@ -819,15 +823,16 @@ function render(){
                 </div>
             </div>
         `;
+
         tree.appendChild(div);
     });
 }
 
-// Generate appropriate action buttons based on node state
 function actionButtons(node){
     if(node.badge === "Root"){
         return `<button class="secondary small" onclick="showProof('${node.id}')">Proof</button>`;
     }
+
     if(node.type === "unverified"){
         return `
             <button class="small" onclick="authorizeNode('${node.id}')">Authorize</button>
@@ -835,13 +840,14 @@ function actionButtons(node){
             <button class="secondary small" onclick="dismissNode('${node.id}')">Dismiss</button>
         `;
     }
+
     if(node.type === "infringe"){
         return `<button class="danger small" onclick="generateReport('${node.id}')">Report</button>`;
     }
+
     return `<button class="secondary small" onclick="showProof('${node.id}')">License</button>`;
 }
 
-// Escape HTML to prevent XSS
 function escapeHTML(text){
     return String(text)
         .replaceAll("&","&amp;")
@@ -851,17 +857,19 @@ function escapeHTML(text){
         .replaceAll("'","&#039;");
 }
 
-// Create root node from form values
 function createRoot(){
     const title = safeText(document.getElementById("workTitle").value, "");
     const author = safeText(document.getElementById("authorId").value, "@OriginalCreator");
     const link = safeUrl(document.getElementById("originalLink").value, "https://example.com/original");
     const proof = safeText(document.getElementById("fingerprint").value, "Original proof / timestamp / fingerprint.");
+
     if(!title){
         alert("Please enter a work title.");
         return;
     }
+
     state.title = title;
+
     state.nodes = [
         {
             id: cryptoId(),
@@ -876,36 +884,16 @@ function createRoot(){
             votes: 0
         }
     ];
+
     saveState();
     render();
 }
 
-// Add a verified node (still available for future use; not exposed in UI)
-function addVerifiedNode(){
-    const reposter = safeText(document.getElementById("reposterId")?.value, "@AuthorizedReposter");
-    const link = safeUrl(document.getElementById("repostLink")?.value, "https://example.com/authorized-repost");
-    const edits = safeText(document.getElementById("editPlan")?.value, "Approved repost.");
-    state.nodes.push({
-        id: cryptoId(),
-        type: "verified",
-        label: "Authorized Repost",
-        badge: "Verified",
-        actor: reposter,
-        role: "Reposter",
-        date: today(),
-        link,
-        note: edits,
-        votes: 0
-    });
-    saveState();
-    render();
-}
-
-// Add unverified node for reported pirating
 function addUnverifiedNode(){
     const suspect = safeText(document.getElementById("suspectId").value, "@CommunityUser");
     const link = safeUrl(document.getElementById("pirateLink").value, "https://example.com/suspected-repost");
     const note = safeText(document.getElementById("pirateNote").value, "Unverified community clue.");
+
     state.nodes.push({
         id: cryptoId(),
         type: "unverified",
@@ -918,64 +906,71 @@ function addUnverifiedNode(){
         note,
         votes: 0
     });
+
     saveState();
     render();
 }
 
-// Convert unverified node to verified
 function authorizeNode(id){
     const node = state.nodes.find(n => n.id === id);
+
     if(!node) return;
+
     node.type = "verified";
     node.label = "Authorized Repost";
     node.badge = "Verified";
     node.role = "Reposter";
+
     saveState();
     render();
 }
 
-// Mark node as infringing
 function markNodeInfringing(id){
     const node = state.nodes.find(n => n.id === id);
+
     if(!node) return;
+
     node.type = "infringe";
     node.label = "Infringing Copy";
     node.badge = "Infringing";
     node.role = "Confirmed";
+
     saveState();
     render();
 }
 
-// Remove a node from the tree
 function dismissNode(id){
     state.nodes = state.nodes.filter(n => n.id !== id);
     saveState();
     render();
 }
 
-// Increment vote count on a node
 function vote(id){
     const node = state.nodes.find(n => n.id === id);
+
     if(!node) return;
+
     node.votes = Number(node.votes || 0) + 1;
+
     saveState();
     render();
 }
 
-// Show proof note in alert
 function showProof(id){
     const node = state.nodes.find(n => n.id === id);
+
     if(!node) return;
+
     alert(node.note || "No proof note.");
 }
 
-// Generate report for all infringing nodes, or a specific target id
 function generateReport(targetId){
     const original = state.nodes.find(n => n.badge === "Root");
     const target = targetId ? state.nodes.find(n => n.id === targetId) : null;
     const infringing = state.nodes.filter(n => n.type === "infringe");
     const verified = state.nodes.filter(n => n.type === "verified");
     const unverified = state.nodes.filter(n => n.type === "unverified");
+
     const report = [
         "TRACE TREE REPORT PACKAGE",
         "=========================",
@@ -1014,20 +1009,20 @@ function generateReport(targetId){
         "---------",
         "Open the platform report page, paste this report, and attach additional screenshots if needed."
     ].join("\n");
+
     document.getElementById("reportText").textContent = report;
     document.getElementById("reportPanel").style.display = "block";
     document.getElementById("reportPanel").scrollIntoView({behavior:"smooth"});
 }
 
-// Download report as a text file
 function downloadReport(){
     const text = document.getElementById("reportText").textContent || "No report generated.";
     downloadFile("tracetree-report.txt", text, "text/plain");
 }
 
-// Copy report to clipboard
 function copyReport(){
     const text = document.getElementById("reportText").textContent || "";
+
     navigator.clipboard.writeText(text).then(() => {
         alert("Report copied.");
     }).catch(() => {
@@ -1035,7 +1030,6 @@ function copyReport(){
     });
 }
 
-// Download JSON representation of the state
 function downloadJSON(){
     downloadFile(
         "tracetree-data.json",
@@ -1044,27 +1038,28 @@ function downloadJSON(){
     );
 }
 
-// Generic file download helper
 function downloadFile(filename, content, type){
     const blob = new Blob([content], {type});
     const url = URL.createObjectURL(blob);
+
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
+
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+
     URL.revokeObjectURL(url);
 }
 
-// Reset demo state and reload page
 function resetDemo(){
     if(!confirm("Reset the demo tree?")) return;
+
     localStorage.removeItem(STORAGE_KEY);
     location.reload();
 }
 
-// Load any saved state and render on page load
 loadState();
 </script>
 
