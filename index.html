@@ -71,20 +71,53 @@ a{
     text-decoration:none;
 }
 
-.home{
-    min-height:100vh;
-    padding:28px;
-    display:flex;
-    flex-direction:column;
+input,
+textarea{
+    width:100%;
+    padding:12px 13px;
+    border:1px solid #d8ddd4;
+    border-radius:13px;
+    margin-bottom:12px;
+    font-size:14px;
+    outline:none;
+    background:white;
+}
+
+input:focus,
+textarea:focus{
+    border-color:var(--green);
+}
+
+textarea{
+    resize:vertical;
+    min-height:88px;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
 }
 
 .nav{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:rgba(247,247,243,0.9);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid #e4e8df;
+}
+
+.nav-inner{
     max-width:1180px;
-    width:100%;
     margin:0 auto;
+    padding:18px 28px;
     display:flex;
     justify-content:space-between;
     align-items:center;
+    gap:18px;
 }
 
 .logo{
@@ -97,13 +130,19 @@ a{
     gap:18px;
     font-size:14px;
     color:var(--muted);
+    flex-wrap:wrap;
+}
+
+.nav-links a.active{
+    color:var(--dark);
+    font-weight:700;
 }
 
 .hero{
-    flex:1;
+    min-height:calc(100vh - 64px);
     max-width:1180px;
-    width:100%;
     margin:0 auto;
+    padding:70px 28px 40px;
     display:grid;
     grid-template-columns:0.9fr 1.1fr;
     gap:42px;
@@ -171,35 +210,63 @@ a{
     fill:var(--red);
 }
 
-.scroll-note{
-    text-align:center;
-    color:var(--muted);
-    font-size:13px;
-    padding-bottom:18px;
-}
-
-.guidelines{
+.main{
     max-width:1180px;
     margin:0 auto;
-    padding:80px 28px 30px;
+    padding:70px 28px 60px;
 }
 
-.guideline-box{
+.section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:26px;
+}
+
+.section-head h2{
+    font-size:34px;
+    letter-spacing:-1px;
+}
+
+.section-head p{
+    color:var(--muted);
+    max-width:720px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(310px,1fr));
+    gap:18px;
+    margin-bottom:24px;
+}
+
+.card,
+.panel{
     background:var(--paper);
     border-radius:var(--radius);
+    padding:22px;
     box-shadow:var(--shadow);
     border:1px solid #e8ece4;
-    padding:28px;
 }
 
-.guideline-box h2{
-    font-size:26px;
-    margin-bottom:22px;
+.card h3,
+.panel h3{
+    font-size:19px;
+    margin-bottom:10px;
+}
+
+.card p,
+.panel p{
+    color:var(--muted);
+    font-size:14px;
+    margin-bottom:14px;
 }
 
 .guideline-grid{
     display:grid;
-    grid-template-columns:repeat(4,minmax(0,1fr));
+    grid-template-columns:repeat(3,minmax(0,1fr));
     gap:16px;
 }
 
@@ -221,41 +288,50 @@ a{
     font-size:14px;
 }
 
-.editor{
-    max-width:1180px;
-    margin:0 auto;
-    padding:90px 28px 60px;
+.status-box{
+    display:none;
+    margin-top:16px;
+    border-radius:16px;
+    padding:14px 16px;
+    background:#eef1eb;
+    color:var(--dark);
+    font-size:14px;
 }
 
-.section-head{
+.status-box.show{
+    display:block;
+}
+
+.trees-toolbar{
     display:flex;
     justify-content:space-between;
-    align-items:flex-end;
-    gap:20px;
+    align-items:center;
+    gap:14px;
     flex-wrap:wrap;
-    margin-bottom:26px;
+    margin-bottom:20px;
 }
 
-.section-head h2{
-    font-size:34px;
-    letter-spacing:-1px;
+.search-box{
+    max-width:420px;
+    margin-bottom:0;
 }
 
-.section-head p{
+.empty{
+    background:var(--paper);
+    border-radius:var(--radius);
+    padding:34px;
+    border:1px dashed #cfd6cc;
     color:var(--muted);
-    max-width:680px;
+    text-align:center;
 }
 
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-    gap:18px;
-    margin-bottom:24px;
+.tree-list{
+    display:flex;
+    flex-direction:column;
+    gap:22px;
 }
 
-.card,
-.tree-panel,
-.report-panel{
+.tree-card{
     background:var(--paper);
     border-radius:var(--radius);
     padding:22px;
@@ -263,48 +339,37 @@ a{
     border:1px solid #e8ece4;
 }
 
-.card h3{
-    font-size:19px;
-    margin-bottom:10px;
-}
-
-.card p{
-    color:var(--muted);
-    font-size:14px;
-    margin-bottom:14px;
-}
-
-input,
-textarea,
-select{
-    width:100%;
-    padding:12px 13px;
-    border:1px solid #d8ddd4;
-    border-radius:13px;
-    margin-bottom:12px;
-    font-size:14px;
-    outline:none;
-    background:white;
-}
-
-input:focus,
-textarea:focus,
-select:focus{
-    border-color:var(--green);
-}
-
-textarea{
-    resize:vertical;
-    min-height:88px;
+.tree-card-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:18px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
 }
 
 .tree-title{
+    font-size:22px;
+    margin-bottom:6px;
+}
+
+.tree-meta{
+    color:var(--muted);
+    font-size:13px;
+}
+
+.tree-link{
+    display:inline-block;
+    margin-top:8px;
+    color:#276ed8;
+    word-break:break-all;
+    font-size:14px;
+}
+
+.tree-actions{
     display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
+    gap:10px;
     flex-wrap:wrap;
-    margin-bottom:24px;
 }
 
 .legend{
@@ -313,6 +378,7 @@ textarea{
     flex-wrap:wrap;
     color:var(--muted);
     font-size:13px;
+    margin-bottom:18px;
 }
 
 .legend span{
@@ -340,16 +406,10 @@ textarea{
     background:var(--red);
 }
 
-.toolbar{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-}
-
 .trace-tree{
     display:flex;
     flex-direction:column;
-    gap:24px;
+    gap:22px;
 }
 
 .node{
@@ -382,16 +442,12 @@ textarea{
     box-shadow:0 0 0 1px rgba(0,0,0,0.08);
 }
 
-.node.verified .dot{
+.node.root-node .dot{
     background:var(--green);
 }
 
-.node.unverified .dot{
+.node.report-node .dot{
     background:var(--gray);
-}
-
-.node.infringe .dot{
-    background:var(--red);
 }
 
 .node-card{
@@ -417,25 +473,14 @@ textarea{
     font-weight:700;
 }
 
-.badge.verified{
+.badge.root{
     background:#e8f5ee;
     color:var(--green);
 }
 
-.badge.unverified{
+.badge.report{
     background:#eeeeee;
     color:#666;
-}
-
-.badge.infringe{
-    background:#fbeceb;
-    color:var(--red);
-}
-
-.meta{
-    color:var(--muted);
-    font-size:13px;
-    margin-bottom:8px;
 }
 
 .node-link{
@@ -453,18 +498,13 @@ textarea{
     align-items:center;
 }
 
-.vote{
-    color:var(--muted);
-    font-size:14px;
-}
-
 .report-panel{
     margin-top:24px;
     display:none;
 }
 
-.report-panel h3{
-    margin-bottom:12px;
+.report-panel.show{
+    display:block;
 }
 
 pre{
@@ -476,7 +516,7 @@ pre{
     padding:16px;
     color:#333;
     font-size:13px;
-    max-height:340px;
+    max-height:360px;
     overflow:auto;
 }
 
@@ -490,7 +530,7 @@ pre{
 @media(max-width:900px){
     .hero{
         grid-template-columns:1fr;
-        padding-top:60px;
+        padding-top:50px;
     }
 
     .tree-symbol{
@@ -498,13 +538,14 @@ pre{
     }
 
     .guideline-grid{
-        grid-template-columns:1fr 1fr;
+        grid-template-columns:1fr;
     }
 }
 
 @media(max-width:620px){
-    .home{
-        padding:22px;
+    .nav-inner{
+        align-items:flex-start;
+        flex-direction:column;
     }
 
     .hero-text h1{
@@ -516,10 +557,6 @@ pre{
         height:420px;
     }
 
-    .guideline-grid{
-        grid-template-columns:1fr;
-    }
-
     .section-head h2{
         font-size:28px;
     }
@@ -529,37 +566,38 @@ pre{
 
 <body>
 
-<section class="home" id="home">
-
-    <nav class="nav">
+<nav class="nav">
+    <div class="nav-inner">
         <div class="logo">TraceTree</div>
 
         <div class="nav-links">
-            <a href="#guidelines">Guidelines</a>
-            <a href="#editor">Edit Tree</a>
+            <a href="#home" id="navHome">Home</a>
+            <a href="#create" id="navCreate">Create / Report</a>
+            <a href="#trees" id="navTrees">Trees</a>
+            <a href="#guidelines" id="navGuidelines">Guidelines</a>
         </div>
-    </nav>
+    </div>
+</nav>
 
+<section class="page active" id="homePage">
     <div class="hero">
-
         <div class="hero-text">
             <h1>Trace<br>the<br>Original.</h1>
-            <p>Verified paths for creative work.</p>
+            <p>Build public paths for creative work.</p>
 
             <div class="hero-actions">
-                <a href="#editor">
-                    <button>Edit Tree</button>
+                <a href="#create">
+                    <button>Create / Report</button>
                 </a>
 
-                <a href="#guidelines">
-                    <button class="secondary">Guidelines</button>
+                <a href="#trees">
+                    <button class="secondary">View Trees</button>
                 </a>
             </div>
         </div>
 
         <div class="tree-symbol" aria-label="symbolic rooted tree">
             <svg class="svg-tree" viewBox="0 0 700 620" preserveAspectRatio="xMidYMid meet">
-
                 <path class="edge" d="M350 530 L350 410" />
                 <path class="edge" d="M350 410 L220 300" />
                 <path class="edge" d="M350 410 L350 270" />
@@ -585,188 +623,168 @@ pre{
                 <circle class="vertex verified" cx="350" cy="125" r="15" />
                 <circle class="vertex unverified" cx="435" cy="170" r="15" />
                 <circle class="vertex infringe" cx="565" cy="190" r="15" />
-
             </svg>
         </div>
-
     </div>
-
-    <div class="scroll-note">Scroll ↓</div>
-
 </section>
 
-<section class="guidelines" id="guidelines">
-
-    <div class="guideline-box">
-        <h2>User Guidelines</h2>
-
-        <div class="guideline-grid">
-
-            <div class="guide">
-                <strong>1. Create Root</strong>
-                <p>Any user can create a root by registering a unique piece of content.</p>
-            </div>
-
-            <div class="guide">
-                <strong>2. Report Pirating</strong>
-                <p>Anyone may report a suspected pirated copy; it becomes a gray unverified node.</p>
-            </div>
-
-            <div class="guide">
-                <strong>3. Review / Report</strong>
-                <p>Nodes can be authorized (green), marked as infringing (red), or dismissed as false.</p>
-            </div>
-
-        </div>
-    </div>
-
-</section>
-
-<section class="editor" id="editor">
-
-    <div class="section-head">
-        <div>
-            <h2>Edit a Trace Tree</h2>
-            <p>Static Cloudflare Pages demo. Data is saved locally in your browser. Create a root node, report pirated copies, and review suspicious nodes.</p>
-        </div>
-
-        <a href="#home">
-            <button class="secondary">Back to Top</button>
-        </a>
-    </div>
-
-    <div class="grid">
-
-        <div class="card">
-            <h3>Create Root</h3>
-            <p>Any user can create a root by providing a unique piece of content.</p>
-
-            <input type="text" placeholder="Title of the work" id="workTitle">
-            <input type="url" placeholder="Link to the work" id="originalLink">
-            <input type="text" placeholder="Original content creator ID" id="authorId">
-            <textarea placeholder="Optional timestamp / fingerprint to help identify unauthorized use" id="fingerprint"></textarea>
-
-            <button onclick="createRoot()">Create Root</button>
-        </div>
-
-        <div class="card">
-            <h3>Report Pirating</h3>
-            <p>Report a suspected pirated copy; becomes an unverified gray node.</p>
-
-            <input type="text" placeholder="Suspect ID (ID of the suspected infringer)" id="suspectId">
-            <input type="url" placeholder="Link to pirated content" id="pirateLink">
-            <textarea placeholder="Notes: description of the suspect and the pirated video, and anything!" id="pirateNote"></textarea>
-
-            <button onclick="addUnverifiedNode()">Report</button>
-        </div>
-
-    </div>
-
-    <div class="tree-panel">
-
-        <div class="tree-title">
+<section class="page" id="createPage">
+    <main class="main">
+        <div class="section-head">
             <div>
-                <h3 id="treeName">Trace Tree Demo</h3>
+                <h2>Create / Report</h2>
+                <p>Create a root for original content, or report piracy. A report creates a new tree only when no tree exists for the same original content.</p>
+            </div>
 
-                <div class="legend">
-                    <span><i class="i-green"></i> Verified</span>
-                    <span><i class="i-gray"></i> Unverified</span>
-                    <span><i class="i-red"></i> Infringing</span>
+            <a href="#trees">
+                <button class="secondary">View Trees</button>
+            </a>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Create Root</h3>
+                <p>Any user can register a unique piece of content.</p>
+
+                <input type="text" placeholder="Title of the work" id="rootTitle">
+                <input type="url" placeholder="Link to the original work" id="rootLink">
+                <input type="text" placeholder="Original content creator ID" id="rootCreator">
+                <textarea placeholder="Optional timestamp / fingerprint / unique marker" id="rootFingerprint"></textarea>
+
+                <button onclick="createRoot()">Create Root</button>
+
+                <div class="status-box" id="rootStatus"></div>
+            </div>
+
+            <div class="card">
+                <h3>Report Pirating</h3>
+                <p>Report a suspected pirated copy. If the original work already has a tree, the report goes into that tree.</p>
+
+                <input type="text" placeholder="Original work title" id="reportOriginalTitle">
+                <input type="url" placeholder="Original work link or content identifier" id="reportOriginalLink">
+                <input type="text" placeholder="Original content creator ID, if known" id="reportCreator">
+                <input type="text" placeholder="Suspect ID / suspected infringer account" id="reportSuspect">
+                <input type="url" placeholder="Link to suspected pirated content" id="reportPirateLink">
+                <textarea placeholder="Notes: describe the suspect, pirated video/article/image, timestamps, similarities, and anything useful" id="reportNote"></textarea>
+
+                <button onclick="reportPirating()">Report Pirating</button>
+
+                <div class="status-box" id="reportStatus"></div>
+            </div>
+        </div>
+    </main>
+</section>
+
+<section class="page" id="treesPage">
+    <main class="main">
+        <div class="section-head">
+            <div>
+                <h2>Tracing Trees</h2>
+                <p>All locally created trees appear here. Each tree starts with one root and grows when people report suspected pirating.</p>
+            </div>
+
+            <a href="#create">
+                <button>Create / Report</button>
+            </a>
+        </div>
+
+        <div class="trees-toolbar">
+            <input class="search-box" type="text" placeholder="Search title, creator, original link, suspect, or pirated link" id="treeSearch" oninput="renderTrees()">
+
+            <div class="actions">
+                <button class="secondary" onclick="downloadJSON()">Download JSON</button>
+                <button class="danger" onclick="resetAll()">Clear All</button>
+            </div>
+        </div>
+
+        <div class="legend">
+            <span><i class="i-green"></i> Root</span>
+            <span><i class="i-gray"></i> Reported piracy</span>
+        </div>
+
+        <div id="treeList" class="tree-list"></div>
+
+        <div class="panel report-panel" id="reportPanel">
+            <h3>Report Package</h3>
+            <pre id="reportText"></pre>
+
+            <div class="actions" style="margin-top:14px;">
+                <button onclick="downloadReport()">Download Report</button>
+                <button class="secondary" onclick="copyReport()">Copy Report</button>
+            </div>
+        </div>
+    </main>
+</section>
+
+<section class="page" id="guidelinesPage">
+    <main class="main">
+        <div class="section-head">
+            <div>
+                <h2>User Guidelines</h2>
+                <p>TraceTree is currently a browser-based prototype for building and viewing content tracing trees.</p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="guideline-grid">
+                <div class="guide">
+                    <strong>1. Create Root</strong>
+                    <p>Use this when you know the original work and want to create a tracing tree for it.</p>
+                </div>
+
+                <div class="guide">
+                    <strong>2. Report Pirating</strong>
+                    <p>Use this when you find suspected stolen or unauthorized content.</p>
+                </div>
+
+                <div class="guide">
+                    <strong>3. Automatic Tree Matching</strong>
+                    <p>If the original content already has a tree, the report is added there. If not, a new tree is created.</p>
                 </div>
             </div>
-
-            <div class="toolbar">
-                <button class="secondary" onclick="generateReport()">Generate Report</button>
-                <button class="secondary" onclick="downloadJSON()">Download JSON</button>
-                <button class="danger" onclick="resetDemo()">Reset Demo</button>
-            </div>
         </div>
-
-        <div class="trace-tree" id="tree"></div>
-    </div>
-
-    <div class="report-panel" id="reportPanel">
-        <h3>Report Package</h3>
-        <pre id="reportText"></pre>
-
-        <div class="actions" style="margin-top:14px;">
-            <button onclick="downloadReport()">Download Report</button>
-            <button class="secondary" onclick="copyReport()">Copy Report</button>
-        </div>
-    </div>
-
+    </main>
 </section>
 
 <div class="footer">
-    TraceTree Prototype · Cloudflare Pages Static Demo
+    TraceTree Prototype · Cloudflare Pages Static Version
 </div>
 
 <script>
-const STORAGE_KEY = "tracetree-static-demo-v1";
+const STORAGE_KEY = "tracetree-trees-v2";
 
 let state = {
-    title: "Trace Tree Demo",
-    nodes: [
-        {
-            id: cryptoId(),
-            type: "verified",
-            label: "Original Work",
-            badge: "Root",
-            actor: "@OriginalCreator",
-            role: "Creator",
-            date: "2026-05-20",
-            link: "https://example.com/original",
-            note: "Original proof node.",
-            votes: 0
-        },
-        {
-            id: cryptoId(),
-            type: "unverified",
-            label: "Reported Pirating",
-            badge: "Unverified",
-            actor: "@SuspectUser",
-            role: "Suspect",
-            date: "2026-05-22",
-            link: "https://example.com/suspected",
-            note: "Needs review.",
-            votes: 43
-        },
-        {
-            id: cryptoId(),
-            type: "infringe",
-            label: "Infringing Copy",
-            badge: "Infringing",
-            actor: "Unknown",
-            role: "Confirmed",
-            date: "2026-05-23",
-            link: "https://example.com/pirated",
-            note: "Marked for report.",
-            votes: 301
-        }
-    ]
+    trees: []
 };
 
-function cryptoId(){
-    return "n_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+function makeId(){
+    return "id_" + Math.random().toString(36).slice(2) + "_" + Date.now().toString(36);
 }
 
-function safeText(value, fallback){
-    const clean = String(value || "").trim();
-    return clean.length > 0 ? clean : fallback;
+function clean(value){
+    return String(value || "").trim();
 }
 
-function safeUrl(value, fallback){
-    const clean = String(value || "").trim();
-
-    if(clean.startsWith("http://") || clean.startsWith("https://")){
-        return clean;
-    }
-
-    return fallback;
+function requireText(value){
+    return clean(value).length > 0;
 }
 
 function today(){
     return new Date().toISOString().slice(0,10);
+}
+
+function normalizeContentKey(link, title){
+    const normalizedLink = clean(link)
+        .toLowerCase()
+        .replace(/^https?:\/\//,"")
+        .replace(/^www\./,"")
+        .replace(/\/$/,"");
+
+    if(normalizedLink){
+        return "link:" + normalizedLink;
+    }
+
+    return "title:" + clean(title).toLowerCase();
 }
 
 function saveState(){
@@ -778,74 +796,15 @@ function loadState(){
 
     if(saved){
         try{
-            state = JSON.parse(saved);
+            const parsed = JSON.parse(saved);
+
+            if(parsed && Array.isArray(parsed.trees)){
+                state = parsed;
+            }
         }catch(error){
             localStorage.removeItem(STORAGE_KEY);
         }
     }
-
-    render();
-}
-
-function render(){
-    document.getElementById("treeName").innerText = state.title;
-
-    const tree = document.getElementById("tree");
-    tree.innerHTML = "";
-
-    state.nodes.forEach(node => {
-        const div = document.createElement("div");
-        div.className = `node ${node.type}`;
-
-        const buttons = actionButtons(node);
-
-        div.innerHTML = `
-            <div class="dot"></div>
-
-            <div class="node-card">
-                <div class="node-top">
-                    <strong>${escapeHTML(node.label)}</strong>
-                    <span class="badge ${node.type}">${escapeHTML(node.badge)}</span>
-                </div>
-
-                <div class="meta">
-                    ${escapeHTML(node.role)}: ${escapeHTML(node.actor)} · ${escapeHTML(node.date)}
-                </div>
-
-                <a class="node-link" href="${escapeHTML(node.link)}" target="_blank">
-                    ${escapeHTML(node.link)}
-                </a>
-
-                <div class="actions">
-                    ${buttons}
-                    <button class="secondary small" onclick="vote('${node.id}')">Vote</button>
-                    <div class="vote">Votes: ${Number(node.votes || 0)}</div>
-                </div>
-            </div>
-        `;
-
-        tree.appendChild(div);
-    });
-}
-
-function actionButtons(node){
-    if(node.badge === "Root"){
-        return `<button class="secondary small" onclick="showProof('${node.id}')">Proof</button>`;
-    }
-
-    if(node.type === "unverified"){
-        return `
-            <button class="small" onclick="authorizeNode('${node.id}')">Authorize</button>
-            <button class="danger small" onclick="markNodeInfringing('${node.id}')">Infringe</button>
-            <button class="secondary small" onclick="dismissNode('${node.id}')">Dismiss</button>
-        `;
-    }
-
-    if(node.type === "infringe"){
-        return `<button class="danger small" onclick="generateReport('${node.id}')">Report</button>`;
-    }
-
-    return `<button class="secondary small" onclick="showProof('${node.id}')">License</button>`;
 }
 
 function escapeHTML(text){
@@ -853,166 +812,300 @@ function escapeHTML(text){
         .replaceAll("&","&amp;")
         .replaceAll("<","&lt;")
         .replaceAll(">","&gt;")
-        .replaceAll('"','&quot;')
+        .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
 }
 
-function createRoot(){
-    const title = safeText(document.getElementById("workTitle").value, "");
-    const author = safeText(document.getElementById("authorId").value, "@OriginalCreator");
-    const link = safeUrl(document.getElementById("originalLink").value, "https://example.com/original");
-    const proof = safeText(document.getElementById("fingerprint").value, "Original proof / timestamp / fingerprint.");
+function showStatus(id, message){
+    const box = document.getElementById(id);
+    box.textContent = message;
+    box.classList.add("show");
+}
 
-    if(!title){
-        alert("Please enter a work title.");
+function clearStatus(id){
+    const box = document.getElementById(id);
+    box.textContent = "";
+    box.classList.remove("show");
+}
+
+function findTreeByKey(key){
+    return state.trees.find(tree => tree.contentKey === key);
+}
+
+function createRoot(){
+    clearStatus("rootStatus");
+
+    const title = clean(document.getElementById("rootTitle").value);
+    const originalLink = clean(document.getElementById("rootLink").value);
+    const creator = clean(document.getElementById("rootCreator").value);
+    const fingerprint = clean(document.getElementById("rootFingerprint").value);
+
+    if(!requireText(title) || !requireText(originalLink) || !requireText(creator)){
+        showStatus("rootStatus", "Please provide title, original link, and creator ID.");
         return;
     }
 
-    state.title = title;
+    const contentKey = normalizeContentKey(originalLink, title);
+    const existing = findTreeByKey(contentKey);
 
-    state.nodes = [
-        {
-            id: cryptoId(),
-            type: "verified",
-            label: "Original Work",
-            badge: "Root",
-            actor: author,
-            role: "Creator",
-            date: today(),
-            link,
-            note: proof,
-            votes: 0
-        }
-    ];
+    if(existing){
+        showStatus("rootStatus", "A tree already exists for this content. Opening it on the Trees page.");
+        location.hash = "#trees";
+        setTimeout(() => scrollToTree(existing.id), 100);
+        return;
+    }
 
+    const tree = {
+        id: makeId(),
+        contentKey,
+        title,
+        originalLink,
+        creator,
+        fingerprint,
+        createdAt: today(),
+        reports: []
+    };
+
+    state.trees.unshift(tree);
     saveState();
-    render();
+
+    showStatus("rootStatus", "Root created. Opening the new tree.");
+    location.hash = "#trees";
+
+    setTimeout(() => scrollToTree(tree.id), 100);
 }
 
-function addUnverifiedNode(){
-    const suspect = safeText(document.getElementById("suspectId").value, "@CommunityUser");
-    const link = safeUrl(document.getElementById("pirateLink").value, "https://example.com/suspected-repost");
-    const note = safeText(document.getElementById("pirateNote").value, "Unverified community clue.");
+function reportPirating(){
+    clearStatus("reportStatus");
 
-    state.nodes.push({
-        id: cryptoId(),
-        type: "unverified",
-        label: "Reported Pirating",
-        badge: "Unverified",
-        actor: suspect,
-        role: "Suspect",
-        date: today(),
-        link,
-        note,
-        votes: 0
+    const title = clean(document.getElementById("reportOriginalTitle").value);
+    const originalLink = clean(document.getElementById("reportOriginalLink").value);
+    const creator = clean(document.getElementById("reportCreator").value) || "Unknown creator";
+    const suspect = clean(document.getElementById("reportSuspect").value);
+    const pirateLink = clean(document.getElementById("reportPirateLink").value);
+    const note = clean(document.getElementById("reportNote").value);
+
+    if(!requireText(title) || !requireText(originalLink) || !requireText(suspect) || !requireText(pirateLink)){
+        showStatus("reportStatus", "Please provide original title, original link/identifier, suspect ID, and pirated link.");
+        return;
+    }
+
+    const contentKey = normalizeContentKey(originalLink, title);
+    let tree = findTreeByKey(contentKey);
+    let createdNewTree = false;
+
+    if(!tree){
+        tree = {
+            id: makeId(),
+            contentKey,
+            title,
+            originalLink,
+            creator,
+            fingerprint: "Created automatically from piracy report.",
+            createdAt: today(),
+            reports: []
+        };
+
+        state.trees.unshift(tree);
+        createdNewTree = true;
+    }
+
+    tree.reports.push({
+        id: makeId(),
+        suspect,
+        pirateLink,
+        note: note || "No notes provided.",
+        reportedAt: today()
     });
 
     saveState();
-    render();
+
+    showStatus(
+        "reportStatus",
+        createdNewTree
+            ? "No existing tree was found, so a new tracing tree was created and the report was added."
+            : "An existing tree was found, so the report was added to that tree."
+    );
+
+    location.hash = "#trees";
+    setTimeout(() => scrollToTree(tree.id), 100);
 }
 
-function authorizeNode(id){
-    const node = state.nodes.find(n => n.id === id);
+function renderTrees(){
+    const list = document.getElementById("treeList");
+    const query = clean(document.getElementById("treeSearch")?.value).toLowerCase();
 
-    if(!node) return;
+    list.innerHTML = "";
 
-    node.type = "verified";
-    node.label = "Authorized Repost";
-    node.badge = "Verified";
-    node.role = "Reposter";
+    const filtered = state.trees.filter(tree => {
+        const searchable = [
+            tree.title,
+            tree.originalLink,
+            tree.creator,
+            tree.fingerprint,
+            ...tree.reports.flatMap(report => [
+                report.suspect,
+                report.pirateLink,
+                report.note
+            ])
+        ].join(" ").toLowerCase();
 
-    saveState();
-    render();
+        return searchable.includes(query);
+    });
+
+    if(filtered.length === 0){
+        list.innerHTML = `
+            <div class="empty">
+                No tracing trees yet. Create a root or report pirating to create the first tree.
+            </div>
+        `;
+        return;
+    }
+
+    filtered.forEach(tree => {
+        const card = document.createElement("article");
+        card.className = "tree-card";
+        card.id = "tree-" + tree.id;
+
+        const reportsHTML = tree.reports.map((report, index) => `
+            <div class="node report-node">
+                <div class="dot"></div>
+
+                <div class="node-card">
+                    <div class="node-top">
+                        <strong>Report ${index + 1}: Suspected Pirating</strong>
+                        <span class="badge report">Unverified</span>
+                    </div>
+
+                    <div class="tree-meta">
+                        Suspect: ${escapeHTML(report.suspect)} · Reported: ${escapeHTML(report.reportedAt)}
+                    </div>
+
+                    <a class="node-link" href="${escapeHTML(report.pirateLink)}" target="_blank">
+                        ${escapeHTML(report.pirateLink)}
+                    </a>
+
+                    <p>${escapeHTML(report.note)}</p>
+                </div>
+            </div>
+        `).join("");
+
+        card.innerHTML = `
+            <div class="tree-card-head">
+                <div>
+                    <h3 class="tree-title">${escapeHTML(tree.title)}</h3>
+
+                    <div class="tree-meta">
+                        Creator: ${escapeHTML(tree.creator)} · Created: ${escapeHTML(tree.createdAt)} · Reports: ${tree.reports.length}
+                    </div>
+
+                    <a class="tree-link" href="${escapeHTML(tree.originalLink)}" target="_blank">
+                        ${escapeHTML(tree.originalLink)}
+                    </a>
+                </div>
+
+                <div class="tree-actions">
+                    <button class="secondary small" onclick="generateReport('${tree.id}')">Generate Report</button>
+                    <button class="secondary small" onclick="copyTreeLink('${tree.id}')">Copy Tree Link</button>
+                </div>
+            </div>
+
+            <div class="trace-tree">
+                <div class="node root-node">
+                    <div class="dot"></div>
+
+                    <div class="node-card">
+                        <div class="node-top">
+                            <strong>Root: Original Content</strong>
+                            <span class="badge root">Root</span>
+                        </div>
+
+                        <div class="tree-meta">
+                            Creator: ${escapeHTML(tree.creator)} · Created: ${escapeHTML(tree.createdAt)}
+                        </div>
+
+                        <a class="node-link" href="${escapeHTML(tree.originalLink)}" target="_blank">
+                            ${escapeHTML(tree.originalLink)}
+                        </a>
+
+                        <p>${escapeHTML(tree.fingerprint || "No fingerprint provided.")}</p>
+                    </div>
+                </div>
+
+                ${reportsHTML}
+            </div>
+        `;
+
+        list.appendChild(card);
+    });
 }
 
-function markNodeInfringing(id){
-    const node = state.nodes.find(n => n.id === id);
+function scrollToTree(treeId){
+    renderTrees();
 
-    if(!node) return;
+    const element = document.getElementById("tree-" + treeId);
 
-    node.type = "infringe";
-    node.label = "Infringing Copy";
-    node.badge = "Infringing";
-    node.role = "Confirmed";
-
-    saveState();
-    render();
+    if(element){
+        element.scrollIntoView({
+            behavior:"smooth",
+            block:"start"
+        });
+    }
 }
 
-function dismissNode(id){
-    state.nodes = state.nodes.filter(n => n.id !== id);
-    saveState();
-    render();
+function generateReport(treeId){
+    const tree = state.trees.find(item => item.id === treeId);
+
+    if(!tree){
+        return;
+    }
+
+    const reports = tree.reports.map((report, index) => `
+REPORT ${index + 1}
+--------
+Suspect ID: ${report.suspect}
+Pirated Link: ${report.pirateLink}
+Reported At: ${report.reportedAt}
+Notes: ${report.note}
+`).join("\n");
+
+    const text = `
+TRACE TREE REPORT PACKAGE
+=========================
+
+WORK
+----
+Title: ${tree.title}
+Original Creator: ${tree.creator}
+Original Link: ${tree.originalLink}
+Created At: ${tree.createdAt}
+Fingerprint / Timestamp: ${tree.fingerprint || "None"}
+
+REPORTED PIRATING
+-----------------
+${reports || "No piracy reports yet."}
+
+NEXT STEP
+---------
+Open the platform report page, paste this package, and attach screenshots if needed.
+`.trim();
+
+    document.getElementById("reportText").textContent = text;
+    document.getElementById("reportPanel").classList.add("show");
+    document.getElementById("reportPanel").scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+    });
 }
 
-function vote(id){
-    const node = state.nodes.find(n => n.id === id);
+function copyTreeLink(treeId){
+    const url = location.origin + location.pathname + "#trees-" + treeId;
 
-    if(!node) return;
-
-    node.votes = Number(node.votes || 0) + 1;
-
-    saveState();
-    render();
-}
-
-function showProof(id){
-    const node = state.nodes.find(n => n.id === id);
-
-    if(!node) return;
-
-    alert(node.note || "No proof note.");
-}
-
-function generateReport(targetId){
-    const original = state.nodes.find(n => n.badge === "Root");
-    const target = targetId ? state.nodes.find(n => n.id === targetId) : null;
-    const infringing = state.nodes.filter(n => n.type === "infringe");
-    const verified = state.nodes.filter(n => n.type === "verified");
-    const unverified = state.nodes.filter(n => n.type === "unverified");
-
-    const report = [
-        "TRACE TREE REPORT PACKAGE",
-        "=========================",
-        "",
-        `Work: ${state.title}`,
-        `Generated: ${new Date().toLocaleString()}`,
-        "",
-        "ORIGINAL PROOF",
-        "--------------",
-        original
-            ? `Creator: ${original.actor}\nOriginal Link: ${original.link}\nDate: ${original.date}\nProof: ${original.note}`
-            : "No root node found.",
-        "",
-        "AUTHORIZED PATHS",
-        "----------------",
-        verified.map((n,i) =>
-            `${i+1}. ${n.label}\n   Actor: ${n.actor}\n   Link: ${n.link}\n   Date: ${n.date}\n   Note: ${n.note}`
-        ).join("\n\n") || "None.",
-        "",
-        "UNVERIFIED CLUES",
-        "----------------",
-        unverified.map((n,i) =>
-            `${i+1}. ${n.label}\n   Suspect: ${n.actor}\n   Link: ${n.link}\n   Votes: ${n.votes}\n   Note: ${n.note}`
-        ).join("\n\n") || "None.",
-        "",
-        "INFRINGEMENT TARGETS",
-        "--------------------",
-        infringing.map((n,i) =>
-            `${i+1}. ${n.label}\n   Link: ${n.link}\n   Votes: ${n.votes}\n   Note: ${n.note}`
-        ).join("\n\n") || "None.",
-        "",
-        target ? "SELECTED TARGET\n---------------\n" +
-        `Label: ${target.label}\nLink: ${target.link}\nStatus: ${target.badge}\nNote: ${target.note}` : "",
-        "",
-        "NEXT STEP",
-        "---------",
-        "Open the platform report page, paste this report, and attach additional screenshots if needed."
-    ].join("\n");
-
-    document.getElementById("reportText").textContent = report;
-    document.getElementById("reportPanel").style.display = "block";
-    document.getElementById("reportPanel").scrollIntoView({behavior:"smooth"});
+    navigator.clipboard.writeText(url).then(() => {
+        alert("Tree link copied.");
+    }).catch(() => {
+        alert(url);
+    });
 }
 
 function downloadReport(){
@@ -1053,14 +1146,83 @@ function downloadFile(filename, content, type){
     URL.revokeObjectURL(url);
 }
 
-function resetDemo(){
-    if(!confirm("Reset the demo tree?")) return;
+function resetAll(){
+    if(!confirm("Clear all locally saved tracing trees?")){
+        return;
+    }
 
     localStorage.removeItem(STORAGE_KEY);
-    location.reload();
+    state = {
+        trees: []
+    };
+
+    renderTrees();
 }
 
+function setActiveNav(name){
+    const links = [
+        ["home", "navHome"],
+        ["create", "navCreate"],
+        ["trees", "navTrees"],
+        ["guidelines", "navGuidelines"]
+    ];
+
+    links.forEach(([key, id]) => {
+        document.getElementById(id).classList.toggle("active", key === name);
+    });
+}
+
+function showPage(name){
+    document.getElementById("homePage").classList.remove("active");
+    document.getElementById("createPage").classList.remove("active");
+    document.getElementById("treesPage").classList.remove("active");
+    document.getElementById("guidelinesPage").classList.remove("active");
+
+    if(name === "create"){
+        document.getElementById("createPage").classList.add("active");
+        setActiveNav("create");
+        return;
+    }
+
+    if(name === "trees"){
+        document.getElementById("treesPage").classList.add("active");
+        setActiveNav("trees");
+        renderTrees();
+        return;
+    }
+
+    if(name === "guidelines"){
+        document.getElementById("guidelinesPage").classList.add("active");
+        setActiveNav("guidelines");
+        return;
+    }
+
+    document.getElementById("homePage").classList.add("active");
+    setActiveNav("home");
+}
+
+function handleRoute(){
+    const hash = location.hash.replace("#","");
+
+    if(hash.startsWith("trees-")){
+        const treeId = hash.replace("trees-","");
+        showPage("trees");
+        setTimeout(() => scrollToTree(treeId), 100);
+        return;
+    }
+
+    if(hash === "create" || hash === "trees" || hash === "guidelines"){
+        showPage(hash);
+        return;
+    }
+
+    showPage("home");
+}
+
+window.addEventListener("hashchange", handleRoute);
+
 loadState();
+handleRoute();
 </script>
 
 </body>
