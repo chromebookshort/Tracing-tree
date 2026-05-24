@@ -1,1229 +1,741 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TraceTree</title>
-
-<style>
-:root{
-    --bg:#f7f7f3;
-    --paper:#ffffff;
-    --text:#20241f;
-    --muted:#73786f;
-    --line:#cfd6cc;
-    --green:#2f8f5b;
-    --gray:#9a9a9a;
-    --red:#c9483b;
-    --dark:#1f2522;
-    --soft:#eef1eb;
-    --shadow:0 18px 48px rgba(20,35,25,0.08);
-    --radius:24px;
-}
-
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
-
-html{
-    scroll-behavior:smooth;
-}
-
-body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    line-height:1.55;
-}
-
-button{
-    border:none;
-    background:var(--dark);
-    color:white;
-    padding:11px 18px;
-    border-radius:999px;
-    cursor:pointer;
-    font-size:14px;
-}
-
-button:hover{
-    opacity:0.92;
-}
-
-button.secondary{
-    background:var(--soft);
-    color:var(--dark);
-}
-
-button.danger{
-    background:var(--red);
-}
-
-button.small{
-    padding:8px 13px;
-    font-size:13px;
-}
-
-a{
-    color:inherit;
-    text-decoration:none;
-}
-
-input,
-textarea{
-    width:100%;
-    padding:12px 13px;
-    border:1px solid #d8ddd4;
-    border-radius:13px;
-    margin-bottom:12px;
-    font-size:14px;
-    outline:none;
-    background:white;
-}
-
-input:focus,
-textarea:focus{
-    border-color:var(--green);
-}
-
-textarea{
-    resize:vertical;
-    min-height:88px;
-}
-
-.page{
-    display:none;
-}
-
-.page.active{
-    display:block;
-}
-
-.nav{
-    position:sticky;
-    top:0;
-    z-index:50;
-    background:rgba(247,247,243,0.9);
-    backdrop-filter:blur(14px);
-    border-bottom:1px solid #e4e8df;
-}
-
-.nav-inner{
-    max-width:1180px;
-    margin:0 auto;
-    padding:18px 28px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:18px;
-}
-
-.logo{
-    font-weight:750;
-    font-size:19px;
-}
-
-.nav-links{
-    display:flex;
-    gap:18px;
-    font-size:14px;
-    color:var(--muted);
-    flex-wrap:wrap;
-}
-
-.nav-links a.active{
-    color:var(--dark);
-    font-weight:700;
-}
-
-.hero{
-    min-height:calc(100vh - 64px);
-    max-width:1180px;
-    margin:0 auto;
-    padding:70px 28px 40px;
-    display:grid;
-    grid-template-columns:0.9fr 1.1fr;
-    gap:42px;
-    align-items:center;
-}
-
-.hero-text h1{
-    font-size:clamp(46px,7vw,90px);
-    line-height:1;
-    letter-spacing:-3px;
-    margin-bottom:20px;
-}
-
-.hero-text p{
-    font-size:18px;
-    color:var(--muted);
-    max-width:440px;
-    margin-bottom:24px;
-}
-
-.hero-actions{
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-}
-
-.tree-symbol{
-    height:620px;
-    background:var(--paper);
-    border-radius:36px;
-    box-shadow:var(--shadow);
-    border:1px solid #e8ece4;
-    overflow:hidden;
-}
-
-.svg-tree{
-    width:100%;
-    height:100%;
-}
-
-.edge{
-    stroke:var(--line);
-    stroke-width:3;
-    fill:none;
-}
-
-.vertex{
-    stroke:white;
-    stroke-width:4;
-}
-
-.root{
-    fill:var(--dark);
-}
-
-.verified{
-    fill:var(--green);
-}
-
-.unverified{
-    fill:var(--gray);
-}
-
-.infringe{
-    fill:var(--red);
-}
-
-.main{
-    max-width:1180px;
-    margin:0 auto;
-    padding:70px 28px 60px;
-}
-
-.section-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-    gap:20px;
-    flex-wrap:wrap;
-    margin-bottom:26px;
-}
-
-.section-head h2{
-    font-size:34px;
-    letter-spacing:-1px;
-}
-
-.section-head p{
-    color:var(--muted);
-    max-width:720px;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(310px,1fr));
-    gap:18px;
-    margin-bottom:24px;
-}
-
-.card,
-.panel{
-    background:var(--paper);
-    border-radius:var(--radius);
-    padding:22px;
-    box-shadow:var(--shadow);
-    border:1px solid #e8ece4;
-}
-
-.card h3,
-.panel h3{
-    font-size:19px;
-    margin-bottom:10px;
-}
-
-.card p,
-.panel p{
-    color:var(--muted);
-    font-size:14px;
-    margin-bottom:14px;
-}
-
-.guideline-grid{
-    display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:16px;
-}
-
-.guide{
-    border:1px solid #ecefe8;
-    border-radius:18px;
-    padding:18px;
-    background:#fbfcfa;
-}
-
-.guide strong{
-    display:block;
-    margin-bottom:8px;
-    font-size:15px;
-}
-
-.guide p{
-    color:var(--muted);
-    font-size:14px;
-}
-
-.status-box{
-    display:none;
-    margin-top:16px;
-    border-radius:16px;
-    padding:14px 16px;
-    background:#eef1eb;
-    color:var(--dark);
-    font-size:14px;
-}
-
-.status-box.show{
-    display:block;
-}
-
-.trees-toolbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:14px;
-    flex-wrap:wrap;
-    margin-bottom:20px;
-}
-
-.search-box{
-    max-width:420px;
-    margin-bottom:0;
-}
-
-.empty{
-    background:var(--paper);
-    border-radius:var(--radius);
-    padding:34px;
-    border:1px dashed #cfd6cc;
-    color:var(--muted);
-    text-align:center;
-}
-
-.tree-list{
-    display:flex;
-    flex-direction:column;
-    gap:22px;
-}
-
-.tree-card{
-    background:var(--paper);
-    border-radius:var(--radius);
-    padding:22px;
-    box-shadow:var(--shadow);
-    border:1px solid #e8ece4;
-}
-
-.tree-card-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:18px;
-    flex-wrap:wrap;
-    margin-bottom:18px;
-}
-
-.tree-title{
-    font-size:22px;
-    margin-bottom:6px;
-}
-
-.tree-meta{
-    color:var(--muted);
-    font-size:13px;
-}
-
-.tree-link{
-    display:inline-block;
-    margin-top:8px;
-    color:#276ed8;
-    word-break:break-all;
-    font-size:14px;
-}
-
-.tree-actions{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.legend{
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-    color:var(--muted);
-    font-size:13px;
-    margin-bottom:18px;
-}
-
-.legend span{
-    display:flex;
-    align-items:center;
-    gap:6px;
-}
-
-.legend i{
-    width:10px;
-    height:10px;
-    display:inline-block;
-    border-radius:50%;
-}
-
-.i-green{
-    background:var(--green);
-}
-
-.i-gray{
-    background:var(--gray);
-}
-
-.i-red{
-    background:var(--red);
-}
-
-.trace-tree{
-    display:flex;
-    flex-direction:column;
-    gap:22px;
-}
-
-.node{
-    position:relative;
-    padding-left:36px;
-}
-
-.node::before{
-    content:"";
-    position:absolute;
-    left:12px;
-    top:0;
-    width:2px;
-    height:100%;
-    background:var(--line);
-}
-
-.node:last-child::before{
-    height:28px;
-}
-
-.dot{
-    position:absolute;
-    left:0;
-    top:8px;
-    width:24px;
-    height:24px;
-    border-radius:50%;
-    border:3px solid white;
-    box-shadow:0 0 0 1px rgba(0,0,0,0.08);
-}
-
-.node.root-node .dot{
-    background:var(--green);
-}
-
-.node.report-node .dot{
-    background:var(--gray);
-}
-
-.node-card{
-    background:#fafbf8;
-    border:1px solid #e9ede5;
-    border-radius:18px;
-    padding:18px;
-}
-
-.node-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-bottom:8px;
-}
-
-.badge{
-    padding:5px 10px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:700;
-}
-
-.badge.root{
-    background:#e8f5ee;
-    color:var(--green);
-}
-
-.badge.report{
-    background:#eeeeee;
-    color:#666;
-}
-
-.node-link{
-    display:inline-block;
-    color:#276ed8;
-    word-break:break-all;
-    font-size:14px;
-    margin-bottom:12px;
-}
-
-.actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    align-items:center;
-}
-
-.report-panel{
-    margin-top:24px;
-    display:none;
-}
-
-.report-panel.show{
-    display:block;
-}
-
-pre{
-    white-space:pre-wrap;
-    word-break:break-word;
-    background:#fafbf8;
-    border:1px solid #e9ede5;
-    border-radius:16px;
-    padding:16px;
-    color:#333;
-    font-size:13px;
-    max-height:360px;
-    overflow:auto;
-}
-
-.footer{
-    text-align:center;
-    color:var(--muted);
-    font-size:14px;
-    padding:42px 20px 58px;
-}
-
-@media(max-width:900px){
-    .hero{
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TraceTree</title>
+  <!-- Include Treeflex CSS for simple tree styling -->
+  <link rel="stylesheet" href="https://unpkg.com/treeflex/dist/css/treeflex.css">
+  <style>
+    /* Basic theme variables */
+    :root{
+      --bg:#f7f7f3;
+      --paper:#ffffff;
+      --text:#20241f;
+      --muted:#73786f;
+      --line:#cfd6cc;
+      --green:#2f8f5b;
+      --gray:#9a9a9a;
+      --red:#c9483b;
+      --dark:#1f2522;
+      --soft:#eef1eb;
+      --shadow:0 12px 30px rgba(0,0,0,0.06);
+      --radius:18px;
+    }
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.55;
+    }
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+    button{
+      border:none;
+      background:var(--dark);
+      color:white;
+      padding:10px 16px;
+      border-radius:999px;
+      cursor:pointer;
+      font-size:14px;
+      transition:background 0.2s;
+    }
+    button:hover{
+      background:var(--green);
+    }
+    button.secondary{
+      background:var(--soft);
+      color:var(--dark);
+    }
+    button.danger{
+      background:var(--red);
+    }
+    button.small{
+      padding:8px 13px;
+      font-size:13px;
+    }
+    /* Navigation bar */
+    .navbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:rgba(247,247,243,0.95);
+      border-bottom:1px solid #e4e8df;
+      backdrop-filter:blur(6px);
+    }
+    .navbar .inner{
+      max-width:1180px;
+      margin:0 auto;
+      padding:16px 24px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .logo{
+      font-weight:700;
+      font-size:20px;
+    }
+    .search-wrapper{
+      position:relative;
+      width:100%;
+      max-width:480px;
+    }
+    .search-wrapper input{
+      width:100%;
+      padding:10px 14px;
+      border:1px solid #d8ddd4;
+      border-radius:14px;
+      font-size:14px;
+      background:white;
+    }
+    .search-results{
+      position:absolute;
+      left:0;
+      right:0;
+      top:100%;
+      background:white;
+      border:1px solid #d8ddd4;
+      border-radius:14px;
+      box-shadow:var(--shadow);
+      max-height:300px;
+      overflow-y:auto;
+      display:none;
+      z-index:100;
+    }
+    .search-results li{
+      padding:8px 12px;
+      cursor:pointer;
+      border-bottom:1px solid #f0f2f0;
+    }
+    .search-results li:last-child{
+      border-bottom:none;
+    }
+    .search-results li:hover{
+      background:#f7f9f7;
+    }
+    /* Main container */
+    .container{
+      max-width:1180px;
+      margin:0 auto;
+      padding:24px;
+    }
+    .tree-area{
+      margin-top:32px;
+      min-height:320px;
+      position:relative;
+    }
+    /* Default sample tree placeholder */
+    .placeholder{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:320px;
+      color:var(--muted);
+      font-style:italic;
+      border:1px dashed #ccd1c8;
+      border-radius:var(--radius);
+      background:var(--paper);
+    }
+    /* Cards for forms */
+    .forms{
+      margin-top:32px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:24px;
+    }
+    .form-card{
+      background:var(--paper);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid #e8ece4;
+      padding:24px;
+    }
+    .form-card h3{
+      margin-bottom:10px;
+      font-size:20px;
+    }
+    .form-card p{
+      margin-bottom:14px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .form-card input,
+    .form-card textarea{
+      width:100%;
+      padding:10px 12px;
+      border:1px solid #d8ddd4;
+      border-radius:12px;
+      font-size:14px;
+      margin-bottom:10px;
+      background:white;
+    }
+    .form-card textarea{
+      resize:vertical;
+      min-height:72px;
+    }
+    .status-msg{
+      margin-top:8px;
+      font-size:13px;
+      color:var(--red);
+    }
+    /* Treeflex override for spacing */
+    .tf-tree{
+      margin:0 auto;
+      padding:20px 0;
+      width:100%;
+      overflow-x:auto;
+      text-align:center;
+    }
+    .tf-tree ul{
+      padding-top:20px;
+    }
+    .tf-tree li{
+      padding:10px;
+      position:relative;
+    }
+    .tf-tree .tf-nc{
+      position:relative;
+      padding:6px 10px;
+      display:inline-block;
+      border-radius:8px;
+      background:#eef1eb;
+      color:var(--dark);
+      font-size:14px;
+      cursor:pointer;
+      user-select:none;
+      box-shadow:0 2px 6px rgba(0,0,0,0.05);
+    }
+    .tf-tree .tf-nc.root{
+      background:var(--green);
+      color:white;
+    }
+    .tf-tree .tf-nc.report{
+      background:var(--gray);
+      color:white;
+    }
+    .tf-tree .vote-count{
+      font-size:12px;
+      margin-left:6px;
+    }
+    /* Popup for node actions */
+    .node-popup{
+      position:absolute;
+      min-width:160px;
+      background:white;
+      border:1px solid #d8ddd4;
+      box-shadow:var(--shadow);
+      border-radius:12px;
+      padding:10px;
+      z-index:1000;
+      display:none;
+    }
+    .node-popup button{
+      margin:4px 0;
+      width:100%;
+      padding:8px 10px;
+      font-size:14px;
+    }
+    .node-popup .cancel{
+      background:#f0f2f0;
+      color:var(--dark);
+    }
+    /* Responsive adjustments */
+    @media(max-width:860px){
+      .forms{
         grid-template-columns:1fr;
-        padding-top:50px;
+      }
     }
-
-    .tree-symbol{
-        height:500px;
-    }
-
-    .guideline-grid{
-        grid-template-columns:1fr;
-    }
-}
-
-@media(max-width:620px){
-    .nav-inner{
-        align-items:flex-start;
-        flex-direction:column;
-    }
-
-    .hero-text h1{
-        font-size:44px;
-        letter-spacing:-1.6px;
-    }
-
-    .tree-symbol{
-        height:420px;
-    }
-
-    .section-head h2{
-        font-size:28px;
-    }
-}
-</style>
+  </style>
 </head>
-
 <body>
-
-<nav class="nav">
-    <div class="nav-inner">
-        <div class="logo">TraceTree</div>
-
-        <div class="nav-links">
-            <a href="#home" id="navHome">Home</a>
-            <a href="#create" id="navCreate">Create / Report</a>
-            <a href="#trees" id="navTrees">Trees</a>
-            <a href="#guidelines" id="navGuidelines">Guidelines</a>
-        </div>
+  <!-- Navigation bar with search -->
+  <header class="navbar">
+    <div class="inner">
+      <div class="logo">TraceTree</div>
+      <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Search existing trees…" autocomplete="off">
+        <ul class="search-results" id="searchResults"></ul>
+      </div>
     </div>
-</nav>
-
-<section class="page active" id="homePage">
-    <div class="hero">
-        <div class="hero-text">
-            <h1>Trace<br>the<br>Original.</h1>
-            <p>Build public paths for creative work.</p>
-
-            <div class="hero-actions">
-                <a href="#create">
-                    <button>Create / Report</button>
-                </a>
-
-                <a href="#trees">
-                    <button class="secondary">View Trees</button>
-                </a>
-            </div>
-        </div>
-
-        <div class="tree-symbol" aria-label="symbolic rooted tree">
-            <svg class="svg-tree" viewBox="0 0 700 620" preserveAspectRatio="xMidYMid meet">
-                <path class="edge" d="M350 530 L350 410" />
-                <path class="edge" d="M350 410 L220 300" />
-                <path class="edge" d="M350 410 L350 270" />
-                <path class="edge" d="M350 410 L480 300" />
-
-                <path class="edge" d="M220 300 L135 190" />
-                <path class="edge" d="M220 300 L265 170" />
-
-                <path class="edge" d="M350 270 L350 125" />
-
-                <path class="edge" d="M480 300 L435 170" />
-                <path class="edge" d="M480 300 L565 190" />
-
-                <circle class="vertex root" cx="350" cy="530" r="22" />
-
-                <circle class="vertex verified" cx="350" cy="410" r="17" />
-                <circle class="vertex verified" cx="220" cy="300" r="17" />
-                <circle class="vertex verified" cx="350" cy="270" r="17" />
-                <circle class="vertex unverified" cx="480" cy="300" r="17" />
-
-                <circle class="vertex verified" cx="135" cy="190" r="15" />
-                <circle class="vertex unverified" cx="265" cy="170" r="15" />
-                <circle class="vertex verified" cx="350" cy="125" r="15" />
-                <circle class="vertex unverified" cx="435" cy="170" r="15" />
-                <circle class="vertex infringe" cx="565" cy="190" r="15" />
-            </svg>
-        </div>
+  </header>
+  <!-- Main content container -->
+  <div class="container">
+    <!-- Tree display area -->
+    <div id="treeArea" class="tree-area">
+      <!-- Placeholder sample tree guidance when no selection -->
+      <div id="placeholder" class="placeholder">Use the search above or create a new tree.</div>
     </div>
-</section>
-
-<section class="page" id="createPage">
-    <main class="main">
-        <div class="section-head">
-            <div>
-                <h2>Create / Report</h2>
-                <p>Create a root for original content, or report piracy. A report creates a new tree only when no tree exists for the same original content.</p>
-            </div>
-
-            <a href="#trees">
-                <button class="secondary">View Trees</button>
-            </a>
-        </div>
-
-        <div class="grid">
-            <div class="card">
-                <h3>Create Root</h3>
-                <p>Any user can register a unique piece of content.</p>
-
-                <input type="text" placeholder="Title of the work" id="rootTitle">
-                <input type="url" placeholder="Link to the original work" id="rootLink">
-                <input type="text" placeholder="Original content creator ID" id="rootCreator">
-                <textarea placeholder="Optional timestamp / fingerprint / unique marker" id="rootFingerprint"></textarea>
-
-                <button onclick="createRoot()">Create Root</button>
-
-                <div class="status-box" id="rootStatus"></div>
-            </div>
-
-            <div class="card">
-                <h3>Report Pirating</h3>
-                <p>Report a suspected pirated copy. If the original work already has a tree, the report goes into that tree.</p>
-
-                <input type="text" placeholder="Original work title" id="reportOriginalTitle">
-                <input type="url" placeholder="Original work link or content identifier" id="reportOriginalLink">
-                <input type="text" placeholder="Original content creator ID, if known" id="reportCreator">
-                <input type="text" placeholder="Suspect ID / suspected infringer account" id="reportSuspect">
-                <input type="url" placeholder="Link to suspected pirated content" id="reportPirateLink">
-                <textarea placeholder="Notes: describe the suspect, pirated video/article/image, timestamps, similarities, and anything useful" id="reportNote"></textarea>
-
-                <button onclick="reportPirating()">Report Pirating</button>
-
-                <div class="status-box" id="reportStatus"></div>
-            </div>
-        </div>
-    </main>
-</section>
-
-<section class="page" id="treesPage">
-    <main class="main">
-        <div class="section-head">
-            <div>
-                <h2>Tracing Trees</h2>
-                <p>All locally created trees appear here. Each tree starts with one root and grows when people report suspected pirating.</p>
-            </div>
-
-            <a href="#create">
-                <button>Create / Report</button>
-            </a>
-        </div>
-
-        <div class="trees-toolbar">
-            <input class="search-box" type="text" placeholder="Search title, creator, original link, suspect, or pirated link" id="treeSearch" oninput="renderTrees()">
-
-            <div class="actions">
-                <button class="secondary" onclick="downloadJSON()">Download JSON</button>
-                <button class="danger" onclick="resetAll()">Clear All</button>
-            </div>
-        </div>
-
-        <div class="legend">
-            <span><i class="i-green"></i> Root</span>
-            <span><i class="i-gray"></i> Reported piracy</span>
-        </div>
-
-        <div id="treeList" class="tree-list"></div>
-
-        <div class="panel report-panel" id="reportPanel">
-            <h3>Report Package</h3>
-            <pre id="reportText"></pre>
-
-            <div class="actions" style="margin-top:14px;">
-                <button onclick="downloadReport()">Download Report</button>
-                <button class="secondary" onclick="copyReport()">Copy Report</button>
-            </div>
-        </div>
-    </main>
-</section>
-
-<section class="page" id="guidelinesPage">
-    <main class="main">
-        <div class="section-head">
-            <div>
-                <h2>User Guidelines</h2>
-                <p>TraceTree is currently a browser-based prototype for building and viewing content tracing trees.</p>
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="guideline-grid">
-                <div class="guide">
-                    <strong>1. Create Root</strong>
-                    <p>Use this when you know the original work and want to create a tracing tree for it.</p>
-                </div>
-
-                <div class="guide">
-                    <strong>2. Report Pirating</strong>
-                    <p>Use this when you find suspected stolen or unauthorized content.</p>
-                </div>
-
-                <div class="guide">
-                    <strong>3. Automatic Tree Matching</strong>
-                    <p>If the original content already has a tree, the report is added there. If not, a new tree is created.</p>
-                </div>
-            </div>
-        </div>
-    </main>
-</section>
-
-<div class="footer">
-    TraceTree Prototype · Cloudflare Pages Static Version
-</div>
-
-<script>
-const STORAGE_KEY = "tracetree-trees-v2";
-
-let state = {
-    trees: []
-};
-
-function makeId(){
-    return "id_" + Math.random().toString(36).slice(2) + "_" + Date.now().toString(36);
-}
-
-function clean(value){
-    return String(value || "").trim();
-}
-
-function requireText(value){
-    return clean(value).length > 0;
-}
-
-function today(){
-    return new Date().toISOString().slice(0,10);
-}
-
-function normalizeContentKey(link, title){
-    const normalizedLink = clean(link)
-        .toLowerCase()
-        .replace(/^https?:\/\//,"")
-        .replace(/^www\./,"")
-        .replace(/\/$/,"");
-
-    if(normalizedLink){
-        return "link:" + normalizedLink;
+    <!-- Forms for creating root and reporting piracy -->
+    <div class="forms">
+      <!-- Create Root Form -->
+      <div class="form-card">
+        <h3>Create Root</h3>
+        <p>Register a unique piece of content to start a tracing tree.</p>
+        <input type="text" id="rootTitle" placeholder="Title of the work">
+        <input type="url" id="rootLink" placeholder="Link to the original work">
+        <input type="text" id="rootCreator" placeholder="Original content creator ID">
+        <textarea id="rootFingerprint" placeholder="Optional timestamp / fingerprint / unique marker"></textarea>
+        <button onclick="handleCreateRoot()">Create Root</button>
+        <div id="rootStatus" class="status-msg"></div>
+      </div>
+      <!-- Report Pirating Form -->
+      <div class="form-card">
+        <h3>Report Pirating</h3>
+        <p>Report a suspected pirated copy; the report will create or extend a tracing tree.</p>
+        <input type="text" id="reportTitle" placeholder="Original work title">
+        <input type="url" id="reportLink" placeholder="Original work link or identifier">
+        <input type="text" id="reportCreator" placeholder="Original content creator ID (optional)">
+        <input type="text" id="reportSuspect" placeholder="Suspect ID / suspected infringer">
+        <input type="url" id="reportPirateLink" placeholder="Link to suspected pirated content">
+        <textarea id="reportNote" placeholder="Notes: describe suspect, pirated content, and details"></textarea>
+        <button onclick="handleReportPirating()">Report Pirating</button>
+        <div id="reportStatus" class="status-msg"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Popup menu for node actions -->
+  <div id="nodePopup" class="node-popup">
+    <button id="upvoteBtn">Upvote</button>
+    <button id="downvoteBtn">Downvote</button>
+    <button id="addLeafBtn">Add Leaf</button>
+    <button class="cancel" onclick="hideNodePopup()">Cancel</button>
+  </div>
+  <!-- Fuse.js for fuzzy searching -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+  <script>
+    /*
+     * TraceTree interactive prototype
+     *
+     * This script enables users to create tracing trees for original works,
+     * report suspected piracy, search existing trees, and interact with tree
+     * nodes (upvote, downvote, add leaves). It uses Fuse.js to perform
+     * fuzzy matching of titles and links to decide whether to add reports
+     * to existing trees or create new ones. Data is stored in
+     * localStorage for client-side persistence.
+     */
+    // Storage key for persistence
+    const STORAGE_KEY = 'tracetree-trees-v3';
+    // In-memory state
+    let state = { trees: [] };
+    let fuse;          // Fuse.js instance for fuzzy search
+    let selectedTreeId = null;  // Currently selected tree ID
+    let popupContext = null;    // Context for node popup (treeId and nodePath)
+    // Utility: generate a simple unique ID
+    function makeId() {
+      return 'id_' + Math.random().toString(36).substring(2,10) + '_' + Date.now().toString(36);
     }
-
-    return "title:" + clean(title).toLowerCase();
-}
-
-function saveState(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
-function loadState(){
-    const saved = localStorage.getItem(STORAGE_KEY);
-
-    if(saved){
-        try{
-            const parsed = JSON.parse(saved);
-
-            if(parsed && Array.isArray(parsed.trees)){
-                state = parsed;
-            }
-        }catch(error){
-            localStorage.removeItem(STORAGE_KEY);
+    // Clean and trim text
+    function clean(value) {
+      return String(value || '').trim();
+    }
+    // Validate required string
+    function isRequired(value) {
+      return clean(value).length > 0;
+    }
+    // Load state from localStorage
+    function loadState() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed && Array.isArray(parsed.trees)) {
+            state.trees = parsed.trees;
+          }
+        } catch (err) {
+          console.warn('Failed to parse saved state', err);
+          localStorage.removeItem(STORAGE_KEY);
         }
+      }
+      updateFuseIndex();
     }
-}
-
-function escapeHTML(text){
-    return String(text)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-}
-
-function showStatus(id, message){
-    const box = document.getElementById(id);
-    box.textContent = message;
-    box.classList.add("show");
-}
-
-function clearStatus(id){
-    const box = document.getElementById(id);
-    box.textContent = "";
-    box.classList.remove("show");
-}
-
-function findTreeByKey(key){
-    return state.trees.find(tree => tree.contentKey === key);
-}
-
-function createRoot(){
-    clearStatus("rootStatus");
-
-    const title = clean(document.getElementById("rootTitle").value);
-    const originalLink = clean(document.getElementById("rootLink").value);
-    const creator = clean(document.getElementById("rootCreator").value);
-    const fingerprint = clean(document.getElementById("rootFingerprint").value);
-
-    if(!requireText(title) || !requireText(originalLink) || !requireText(creator)){
-        showStatus("rootStatus", "Please provide title, original link, and creator ID.");
+    // Save state to localStorage
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    // Build or rebuild Fuse.js index for existing trees
+    function updateFuseIndex() {
+      if (state.trees.length > 0) {
+        fuse = new Fuse(state.trees, {
+          keys: ['title', 'originalLink', 'creator', 'fingerprint'],
+          includeScore: true,
+          threshold: 0.4, // 0 = perfect match, 1 = match all
+          ignoreLocation: true
+        });
+      } else {
+        fuse = null;
+      }
+    }
+    // Create a new root tree
+    function handleCreateRoot() {
+      const title = clean(document.getElementById('rootTitle').value);
+      const link = clean(document.getElementById('rootLink').value);
+      const creator = clean(document.getElementById('rootCreator').value);
+      const fingerprint = clean(document.getElementById('rootFingerprint').value);
+      const statusEl = document.getElementById('rootStatus');
+      statusEl.textContent = '';
+      if (!isRequired(title) || !isRequired(link) || !isRequired(creator)) {
+        statusEl.textContent = 'Please provide title, link, and creator ID.';
         return;
-    }
-
-    const contentKey = normalizeContentKey(originalLink, title);
-    const existing = findTreeByKey(contentKey);
-
-    if(existing){
-        showStatus("rootStatus", "A tree already exists for this content. Opening it on the Trees page.");
-        location.hash = "#trees";
-        setTimeout(() => scrollToTree(existing.id), 100);
+      }
+      // Search for approximate existing tree
+      let matched = null;
+      if (fuse) {
+        const results = fuse.search(title + ' ' + link);
+        if (results.length > 0 && results[0].score <= 0.3) {
+          matched = results[0].item;
+        }
+      }
+      if (matched) {
+        // If match found, inform user and select existing tree
+        statusEl.textContent = 'A similar tree already exists. Adding root aborted; selecting existing tree.';
+        selectedTreeId = matched.id;
+        renderTreeArea();
         return;
-    }
-
-    const tree = {
+      }
+      // Create new tree
+      const newTree = {
         id: makeId(),
-        contentKey,
         title,
-        originalLink,
+        originalLink: link,
         creator,
         fingerprint,
         createdAt: today(),
-        reports: []
-    };
-
-    state.trees.unshift(tree);
-    saveState();
-
-    showStatus("rootStatus", "Root created. Opening the new tree.");
-    location.hash = "#trees";
-
-    setTimeout(() => scrollToTree(tree.id), 100);
-}
-
-function reportPirating(){
-    clearStatus("reportStatus");
-
-    const title = clean(document.getElementById("reportOriginalTitle").value);
-    const originalLink = clean(document.getElementById("reportOriginalLink").value);
-    const creator = clean(document.getElementById("reportCreator").value) || "Unknown creator";
-    const suspect = clean(document.getElementById("reportSuspect").value);
-    const pirateLink = clean(document.getElementById("reportPirateLink").value);
-    const note = clean(document.getElementById("reportNote").value);
-
-    if(!requireText(title) || !requireText(originalLink) || !requireText(suspect) || !requireText(pirateLink)){
-        showStatus("reportStatus", "Please provide original title, original link/identifier, suspect ID, and pirated link.");
+        votes: 0,
+        children: []
+      };
+      state.trees.unshift(newTree);
+      saveState();
+      updateFuseIndex();
+      statusEl.textContent = 'Root created successfully!';
+      // Reset form inputs
+      document.getElementById('rootTitle').value = '';
+      document.getElementById('rootLink').value = '';
+      document.getElementById('rootCreator').value = '';
+      document.getElementById('rootFingerprint').value = '';
+      selectedTreeId = newTree.id;
+      renderTreeArea();
+    }
+    // Helper: get current date as YYYY-MM-DD
+    function today() {
+      return new Date().toISOString().slice(0,10);
+    }
+    // Handle reporting pirating
+    function handleReportPirating() {
+      const origTitle = clean(document.getElementById('reportTitle').value);
+      const origLink = clean(document.getElementById('reportLink').value);
+      const creator = clean(document.getElementById('reportCreator').value) || 'Unknown creator';
+      const suspect = clean(document.getElementById('reportSuspect').value);
+      const pirateLink = clean(document.getElementById('reportPirateLink').value);
+      const note = clean(document.getElementById('reportNote').value);
+      const statusEl = document.getElementById('reportStatus');
+      statusEl.textContent = '';
+      if (!isRequired(origTitle) || !isRequired(origLink) || !isRequired(suspect) || !isRequired(pirateLink)) {
+        statusEl.textContent = 'Please fill in original title, original link, suspect ID, and pirated link.';
         return;
-    }
-
-    const contentKey = normalizeContentKey(originalLink, title);
-    let tree = findTreeByKey(contentKey);
-    let createdNewTree = false;
-
-    if(!tree){
-        tree = {
-            id: makeId(),
-            contentKey,
-            title,
-            originalLink,
-            creator,
-            fingerprint: "Created automatically from piracy report.",
-            createdAt: today(),
-            reports: []
+      }
+      // Determine if there is an existing tree for the content
+      let targetTree = null;
+      if (fuse) {
+        const results = fuse.search(origTitle + ' ' + origLink);
+        if (results.length > 0 && results[0].score <= 0.3) {
+          targetTree = results[0].item;
+        }
+      }
+      let newCreated = false;
+      if (!targetTree) {
+        // Create new tree automatically
+        targetTree = {
+          id: makeId(),
+          title: origTitle,
+          originalLink: origLink,
+          creator,
+          fingerprint: 'Created from report.',
+          createdAt: today(),
+          votes: 0,
+          children: []
         };
-
-        state.trees.unshift(tree);
-        createdNewTree = true;
-    }
-
-    tree.reports.push({
+        state.trees.unshift(targetTree);
+        newCreated = true;
+      }
+      // Add report as a child of root
+      const reportNode = {
         id: makeId(),
+        type: 'report',
         suspect,
         pirateLink,
-        note: note || "No notes provided.",
-        reportedAt: today()
-    });
-
-    saveState();
-
-    showStatus(
-        "reportStatus",
-        createdNewTree
-            ? "No existing tree was found, so a new tracing tree was created and the report was added."
-            : "An existing tree was found, so the report was added to that tree."
-    );
-
-    location.hash = "#trees";
-    setTimeout(() => scrollToTree(tree.id), 100);
-}
-
-function renderTrees(){
-    const list = document.getElementById("treeList");
-    const query = clean(document.getElementById("treeSearch")?.value).toLowerCase();
-
-    list.innerHTML = "";
-
-    const filtered = state.trees.filter(tree => {
-        const searchable = [
-            tree.title,
-            tree.originalLink,
-            tree.creator,
-            tree.fingerprint,
-            ...tree.reports.flatMap(report => [
-                report.suspect,
-                report.pirateLink,
-                report.note
-            ])
-        ].join(" ").toLowerCase();
-
-        return searchable.includes(query);
-    });
-
-    if(filtered.length === 0){
-        list.innerHTML = `
-            <div class="empty">
-                No tracing trees yet. Create a root or report pirating to create the first tree.
-            </div>
-        `;
-        return;
+        note: note || 'No notes provided.',
+        votes: 0,
+        children: []
+      };
+      targetTree.children.push(reportNode);
+      saveState();
+      updateFuseIndex();
+      statusEl.textContent = newCreated
+        ? 'No matching tree found; created new tree and added report.'
+        : 'Matching tree found; report added to existing tree.';
+      // Reset inputs
+      document.getElementById('reportTitle').value = '';
+      document.getElementById('reportLink').value = '';
+      document.getElementById('reportCreator').value = '';
+      document.getElementById('reportSuspect').value = '';
+      document.getElementById('reportPirateLink').value = '';
+      document.getElementById('reportNote').value = '';
+      selectedTreeId = targetTree.id;
+      renderTreeArea();
     }
-
-    filtered.forEach(tree => {
-        const card = document.createElement("article");
-        card.className = "tree-card";
-        card.id = "tree-" + tree.id;
-
-        const reportsHTML = tree.reports.map((report, index) => `
-            <div class="node report-node">
-                <div class="dot"></div>
-
-                <div class="node-card">
-                    <div class="node-top">
-                        <strong>Report ${index + 1}: Suspected Pirating</strong>
-                        <span class="badge report">Unverified</span>
-                    </div>
-
-                    <div class="tree-meta">
-                        Suspect: ${escapeHTML(report.suspect)} · Reported: ${escapeHTML(report.reportedAt)}
-                    </div>
-
-                    <a class="node-link" href="${escapeHTML(report.pirateLink)}" target="_blank">
-                        ${escapeHTML(report.pirateLink)}
-                    </a>
-
-                    <p>${escapeHTML(report.note)}</p>
-                </div>
-            </div>
-        `).join("");
-
-        card.innerHTML = `
-            <div class="tree-card-head">
-                <div>
-                    <h3 class="tree-title">${escapeHTML(tree.title)}</h3>
-
-                    <div class="tree-meta">
-                        Creator: ${escapeHTML(tree.creator)} · Created: ${escapeHTML(tree.createdAt)} · Reports: ${tree.reports.length}
-                    </div>
-
-                    <a class="tree-link" href="${escapeHTML(tree.originalLink)}" target="_blank">
-                        ${escapeHTML(tree.originalLink)}
-                    </a>
-                </div>
-
-                <div class="tree-actions">
-                    <button class="secondary small" onclick="generateReport('${tree.id}')">Generate Report</button>
-                    <button class="secondary small" onclick="copyTreeLink('${tree.id}')">Copy Tree Link</button>
-                </div>
-            </div>
-
-            <div class="trace-tree">
-                <div class="node root-node">
-                    <div class="dot"></div>
-
-                    <div class="node-card">
-                        <div class="node-top">
-                            <strong>Root: Original Content</strong>
-                            <span class="badge root">Root</span>
-                        </div>
-
-                        <div class="tree-meta">
-                            Creator: ${escapeHTML(tree.creator)} · Created: ${escapeHTML(tree.createdAt)}
-                        </div>
-
-                        <a class="node-link" href="${escapeHTML(tree.originalLink)}" target="_blank">
-                            ${escapeHTML(tree.originalLink)}
-                        </a>
-
-                        <p>${escapeHTML(tree.fingerprint || "No fingerprint provided.")}</p>
-                    </div>
-                </div>
-
-                ${reportsHTML}
-            </div>
-        `;
-
-        list.appendChild(card);
-    });
-}
-
-function scrollToTree(treeId){
-    renderTrees();
-
-    const element = document.getElementById("tree-" + treeId);
-
-    if(element){
-        element.scrollIntoView({
-            behavior:"smooth",
-            block:"start"
+    // Render the tree area: show placeholder, sample tree, or selected tree
+    function renderTreeArea() {
+      const treeArea = document.getElementById('treeArea');
+      const placeholder = document.getElementById('placeholder');
+      treeArea.innerHTML = '';
+      // Clear any popups
+      hideNodePopup();
+      if (!selectedTreeId) {
+        // Show placeholder guidance
+        treeArea.appendChild(placeholder);
+        placeholder.style.display = 'flex';
+        return;
+      }
+      placeholder.style.display = 'none';
+      const tree = state.trees.find(t => t.id === selectedTreeId);
+      if (!tree) {
+        // If tree not found, fallback to placeholder
+        selectedTreeId = null;
+        treeArea.appendChild(placeholder);
+        placeholder.style.display = 'flex';
+        return;
+      }
+      // Build HTML for tree using Treeflex
+      const html = buildTreeHTML(tree);
+      treeArea.innerHTML = html;
+      // Reattach event listeners for node clicks after rendering
+      attachNodeClickHandlers();
+    }
+    // Build HTML for a tree using nested lists
+    function buildTreeHTML(tree) {
+      // Root node wrapper
+      let html = '<div class="tf-tree"><ul>';
+      html += buildNodeHTML({
+        id: tree.id,
+        type: 'root',
+        label: tree.title,
+        votes: tree.votes,
+        children: tree.children
+      }, '');
+      html += '</ul></div>';
+      return html;
+    }
+    // Recursively build HTML for each node
+    function buildNodeHTML(node, path) {
+      const nodeId = node.id;
+      const nodeType = node.type || 'root';
+      let displayText;
+      if (nodeType === 'root') {
+        displayText = escapeHtml(node.label);
+      } else {
+        // Display suspect ID as label for report nodes
+        displayText = escapeHtml(node.suspect);
+      }
+      const vote = node.votes || 0;
+      // Compose the HTML for this node
+      let html = '<li>';
+      html += `<span class="tf-nc tree-node ${nodeType}" data-tree-id="${selectedTreeId}" data-path="${path}" data-node-id="${nodeId}" data-type="${nodeType}">` +
+              `${displayText}<span class="vote-count">(${vote})</span></span>`;
+      // Recursively build children if any
+      if (node.children && node.children.length > 0) {
+        html += '<ul>';
+        node.children.forEach((child, index) => {
+          const childPath = path ? \`\${path},\${index}\` : String(index);
+          html += buildNodeHTML({
+            id: child.id,
+            type: 'report',
+            suspect: child.suspect,
+            pirateLink: child.pirateLink,
+            note: child.note,
+            votes: child.votes,
+            children: child.children || []
+          }, childPath);
         });
+        html += '</ul>';
+      }
+      html += '</li>';
+      return html;
     }
-}
-
-function generateReport(treeId){
-    const tree = state.trees.find(item => item.id === treeId);
-
-    if(!tree){
-        return;
+    // Escape HTML entities to prevent injection
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>\"']/g, function(match) {
+        switch(match) {
+          case '&': return '&amp;';
+          case '<': return '&lt;';
+          case '>': return '&gt;';
+          case '\"': return '&quot;';
+          case "'": return '&#39;';
+          default: return match;
+        }
+      });
     }
-
-    const reports = tree.reports.map((report, index) => `
-REPORT ${index + 1}
---------
-Suspect ID: ${report.suspect}
-Pirated Link: ${report.pirateLink}
-Reported At: ${report.reportedAt}
-Notes: ${report.note}
-`).join("\n");
-
-    const text = `
-TRACE TREE REPORT PACKAGE
-=========================
-
-WORK
-----
-Title: ${tree.title}
-Original Creator: ${tree.creator}
-Original Link: ${tree.originalLink}
-Created At: ${tree.createdAt}
-Fingerprint / Timestamp: ${tree.fingerprint || "None"}
-
-REPORTED PIRATING
------------------
-${reports || "No piracy reports yet."}
-
-NEXT STEP
----------
-Open the platform report page, paste this package, and attach screenshots if needed.
-`.trim();
-
-    document.getElementById("reportText").textContent = text;
-    document.getElementById("reportPanel").classList.add("show");
-    document.getElementById("reportPanel").scrollIntoView({
-        behavior:"smooth",
-        block:"start"
+    // Attach click handlers to all tree nodes
+    function attachNodeClickHandlers() {
+      const nodes = document.querySelectorAll('.tree-node');
+      nodes.forEach(node => {
+        node.addEventListener('click', function(event) {
+          event.stopPropagation();
+          const treeId = node.getAttribute('data-tree-id');
+          const path = node.getAttribute('data-path');
+          const nodeType = node.getAttribute('data-type');
+          // Show popup menu near the clicked node
+          showNodePopup(event, treeId, path, nodeType);
+        });
+      });
+    }
+    // Show popup menu for node actions
+    function showNodePopup(event, treeId, path, nodeType) {
+      popupContext = { treeId, path, type: nodeType };
+      const popup = document.getElementById('nodePopup');
+      popup.style.display = 'block';
+      // Position near the clicked node
+      const rect = event.target.getBoundingClientRect();
+      const scrollY = window.scrollY || window.pageYOffset;
+      const scrollX = window.scrollX || window.pageXOffset;
+      // Adjust the popup to not overflow viewport
+      const top = rect.top + scrollY + rect.height + 6;
+      let left = rect.left + scrollX;
+      // Ensure popup stays within viewport horizontally
+      const popupWidth = 200;
+      if (left + popupWidth > window.innerWidth) {
+        left = window.innerWidth - popupWidth - 20;
+      }
+      popup.style.top = top + 'px';
+      popup.style.left = left + 'px';
+    }
+    // Hide popup menu
+    function hideNodePopup() {
+      const popup = document.getElementById('nodePopup');
+      popup.style.display = 'none';
+      popupContext = null;
+    }
+    // Upvote selected node
+    document.getElementById('upvoteBtn').addEventListener('click', function() {
+      if (!popupContext) return;
+      modifyVotes(popupContext.treeId, popupContext.path, 1);
+      hideNodePopup();
     });
-}
-
-function copyTreeLink(treeId){
-    const url = location.origin + location.pathname + "#trees-" + treeId;
-
-    navigator.clipboard.writeText(url).then(() => {
-        alert("Tree link copied.");
-    }).catch(() => {
-        alert(url);
+    // Downvote selected node
+    document.getElementById('downvoteBtn').addEventListener('click', function() {
+      if (!popupContext) return;
+      modifyVotes(popupContext.treeId, popupContext.path, -1);
+      hideNodePopup();
     });
-}
-
-function downloadReport(){
-    const text = document.getElementById("reportText").textContent || "No report generated.";
-    downloadFile("tracetree-report.txt", text, "text/plain");
-}
-
-function copyReport(){
-    const text = document.getElementById("reportText").textContent || "";
-
-    navigator.clipboard.writeText(text).then(() => {
-        alert("Report copied.");
-    }).catch(() => {
-        alert("Copy failed. Select the report text manually.");
+    // Add new leaf to selected node
+    document.getElementById('addLeafBtn').addEventListener('click', function() {
+      if (!popupContext) return;
+      const treeId = popupContext.treeId;
+      const path = popupContext.path;
+      // Ask for suspect ID, link, and note via prompt
+      const suspect = prompt('Enter suspect ID:');
+      if (!suspect) return;
+      const pirateLink = prompt('Enter link to suspected pirated content:');
+      if (!pirateLink) return;
+      const note = prompt('Enter a note (optional):') || '';
+      addLeaf(treeId, path, suspect, pirateLink, note);
+      hideNodePopup();
     });
-}
-
-function downloadJSON(){
-    downloadFile(
-        "tracetree-data.json",
-        JSON.stringify(state, null, 2),
-        "application/json"
-    );
-}
-
-function downloadFile(filename, content, type){
-    const blob = new Blob([content], {type});
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    URL.revokeObjectURL(url);
-}
-
-function resetAll(){
-    if(!confirm("Clear all locally saved tracing trees?")){
-        return;
+    // Modify votes on a node by delta (positive or negative)
+    function modifyVotes(treeId, path, delta) {
+      const tree = state.trees.find(t => t.id === treeId);
+      if (!tree) return;
+      let node = tree;
+      if (path !== '') {
+        const parts = path.split(',');
+        for (const idx of parts) {
+          node = node.children[parseInt(idx)];
+          if (!node) return;
+        }
+      }
+      if (!node.votes) node.votes = 0;
+      node.votes = Math.max(0, node.votes + delta);
+      saveState();
+      renderTreeArea();
     }
-
-    localStorage.removeItem(STORAGE_KEY);
-    state = {
-        trees: []
-    };
-
-    renderTrees();
-}
-
-function setActiveNav(name){
-    const links = [
-        ["home", "navHome"],
-        ["create", "navCreate"],
-        ["trees", "navTrees"],
-        ["guidelines", "navGuidelines"]
-    ];
-
-    links.forEach(([key, id]) => {
-        document.getElementById(id).classList.toggle("active", key === name);
+    // Add a new leaf (report) to a node
+    function addLeaf(treeId, path, suspect, pirateLink, note) {
+      const tree = state.trees.find(t => t.id === treeId);
+      if (!tree) return;
+      let node = tree;
+      if (path !== '') {
+        const parts = path.split(',');
+        for (const idx of parts) {
+          node = node.children[parseInt(idx)];
+          if (!node) return;
+        }
+      }
+      // Create and append new child
+      const newChild = {
+        id: makeId(),
+        type: 'report',
+        suspect,
+        pirateLink,
+        note: note || 'No note provided.',
+        votes: 0,
+        children: []
+      };
+      if (!node.children) node.children = [];
+      node.children.push(newChild);
+      saveState();
+      renderTreeArea();
+    }
+    // Handle search input to show suggestions
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+    searchInput.addEventListener('input', function() {
+      const query = clean(searchInput.value);
+      if (!query) {
+        searchResults.style.display = 'none';
+        searchResults.innerHTML = '';
+        return;
+      }
+      if (!fuse) {
+        searchResults.style.display = 'none';
+        searchResults.innerHTML = '';
+        return;
+      }
+      const results = fuse.search(query).map(r => r.item);
+      if (results.length === 0) {
+        searchResults.innerHTML = '<li>No matches found</li>';
+        searchResults.style.display = 'block';
+        return;
+      }
+      searchResults.innerHTML = '';
+      results.slice(0, 10).forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item.title + ' (Creator: ' + item.creator + ')';
+        li.addEventListener('click', () => {
+          selectedTreeId = item.id;
+          searchResults.style.display = 'none';
+          searchResults.innerHTML = '';
+          searchInput.value = '';
+          renderTreeArea();
+        });
+        searchResults.appendChild(li);
+      });
+      searchResults.style.display = 'block';
     });
-}
-
-function showPage(name){
-    document.getElementById("homePage").classList.remove("active");
-    document.getElementById("createPage").classList.remove("active");
-    document.getElementById("treesPage").classList.remove("active");
-    document.getElementById("guidelinesPage").classList.remove("active");
-
-    if(name === "create"){
-        document.getElementById("createPage").classList.add("active");
-        setActiveNav("create");
-        return;
-    }
-
-    if(name === "trees"){
-        document.getElementById("treesPage").classList.add("active");
-        setActiveNav("trees");
-        renderTrees();
-        return;
-    }
-
-    if(name === "guidelines"){
-        document.getElementById("guidelinesPage").classList.add("active");
-        setActiveNav("guidelines");
-        return;
-    }
-
-    document.getElementById("homePage").classList.add("active");
-    setActiveNav("home");
-}
-
-function handleRoute(){
-    const hash = location.hash.replace("#","");
-
-    if(hash.startsWith("trees-")){
-        const treeId = hash.replace("trees-","");
-        showPage("trees");
-        setTimeout(() => scrollToTree(treeId), 100);
-        return;
-    }
-
-    if(hash === "create" || hash === "trees" || hash === "guidelines"){
-        showPage(hash);
-        return;
-    }
-
-    showPage("home");
-}
-
-window.addEventListener("hashchange", handleRoute);
-
-loadState();
-handleRoute();
-</script>
-
+    // Hide search results on click outside
+    document.addEventListener('click', function(event) {
+      if (!searchResults.contains(event.target) && event.target !== searchInput) {
+        searchResults.style.display = 'none';
+      }
+    });
+    // Initial load
+    loadState();
+    renderTreeArea();
+  </script>
 </body>
 </html>
