@@ -1,3 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TraceTree</title>
+
+<style>
+:root{
+    --bg:#f7f7f3;
+    --paper:#ffffff;
+    --text:#20241f;
+    --muted:#73786f;
+    --line:#bfc7bb;
+    --green:#2f8f5b;
+    --gray:#9a9a9a;
+    --red:#c9483b;
+    --dark:#1f2522;
+    --soft:#eef1eb;
+    --blue:#276ed8;
+    --shadow:0 18px 48px rgba(20,35,25,0.08);
+    --radius:24px;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.55;
+}
+
+button{
+    border:none;
+    background:var(--dark);
+    color:white;
+    padding:10px 16px;
+    border-radius:999px;
+    cursor:pointer;
+    font-size:14px;
+}
+
+button:hover{
+    opacity:0.92;
+}
+
+button.secondary{
+    background:var(--soft);
+    color:var(--dark);
+}
+
+button.danger{
+    background:var(--red);
+}
+
+button.small{
+    padding:7px 12px;
+    font-size:13px;
+}
+
+a{
+    color:var(--blue);
+    text-decoration:none;
+    word-break:break-all;
+}
+
+input,
+textarea{
+    width:100%;
+    padding:12px 13px;
+    border:1px solid #d8ddd4;
+    border-radius:13px;
+    margin-bottom:12px;
+    font-size:14px;
+    outline:none;
+    background:white;
+}
+
+input:focus,
+textarea:focus{
+    border-color:var(--green);
+}
+
+textarea{
+    resize:vertical;
+    min-height:86px;
+}
+
+.nav{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:rgba(247,247,243,0.92);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid #e4e8df;
+}
+
+.nav-inner{
+    max-width:1220px;
+    margin:0 auto;
+    padding:16px 28px;
+    display:grid;
+    grid-template-columns:160px 1fr auto;
+    gap:18px;
+    align-items:center;
+}
+
+.logo{
+    font-weight:800;
+    font-size:20px;
+}
+
+.search-wrap{
+    position:relative;
+}
+
+#treeSearch{
+    margin-bottom:0;
+    border-radius:999px;
+    padding-left:16px;
+}
+
+.search-results{
+    display:none;
+    position:absolute;
+    left:0;
+    right:0;
+    top:48px;
+    background:white;
+    border:1px solid #e3e7dd;
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    max-height:360px;
+    overflow:auto;
+    z-index:30;
+}
+
+.search-results.show{
+    display:block;
+}
+
+.search-result{
+    padding:14px 16px;
+    border-bottom:1px solid #f0f2ed;
+    cursor:pointer;
+}
+
+.search-result:last-child{
+    border-bottom:none;
+}
+
+.search-result:hover{
+    background:#fafbf8;
+}
+
+.search-result strong{
+    display:block;
+    font-size:14px;
+}
+
+.search-result span{
+    display:block;
+    color:var(--muted);
+    font-size:12px;
+    margin-top:3px;
+}
+
+.container{
+    max-width:1220px;
+    margin:0 auto;
+    padding:34px 28px 70px;
+}
+
+.hero{
+    display:grid;
+    grid-template-columns:0.85fr 1.15fr;
+    gap:26px;
+    align-items:stretch;
+    margin-bottom:28px;
+}
+
+.intro,
+.workspace,
+.card,
+.status-box,
+.report-output{
+    background:var(--paper);
+    border:1px solid #e8ece4;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+}
+
+.intro{
+    padding:28px;
+}
+
+.intro h1{
+    font-size:clamp(42px,6vw,78px);
+    line-height:1;
+    letter-spacing:-2px;
+    margin-bottom:18px;
+}
+
+.intro p{
+    color:var(--muted);
+    max-width:460px;
+    margin-bottom:20px;
+}
+
+.legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:16px;
+    color:var(--muted);
+    font-size:13px;
+}
+
+.legend span{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.legend i{
+    width:10px;
+    height:10px;
+    display:inline-block;
+    border-radius:50%;
+}
+
+.i-root{background:var(--green);}
+.i-report{background:var(--gray);}
+.i-selected{background:var(--red);}
+
+.workspace{
+    min-height:460px;
+    padding:22px;
+    overflow:hidden;
+}
+
+.workspace-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    margin-bottom:12px;
+}
+
+.workspace-head h2{
+    font-size:24px;
+    line-height:1.2;
+}
+
+.workspace-head p{
+    color:var(--muted);
+    font-size:13px;
+    margin-top:4px;
+}
+
+.tree-shell{
+    width:100%;
+    min-height:390px;
+    border-radius:18px;
+    background:#fafbf8;
+    border:1px solid #edf0e8;
+    overflow:auto;
+}
+
+#treeSvg{
+    width:100%;
+    min-width:760px;
+    min-height:390px;
+    display:block;
+}
+
+.edge{
+    stroke:var(--line);
+    stroke-width:2;
+    stroke-linecap:round;
+    opacity:0.95;
+}
+
+.sample-edge{
+    stroke:var(--line);
+    stroke-width:2;
+    stroke-linecap:round;
+    opacity:0.9;
+}
+
+.node-circle{
+    cursor:pointer;
+    stroke:white;
+    stroke-width:4;
+    filter:drop-shadow(0 4px 5px rgba(0,0,0,0.08));
+}
+
+.node-root{
+    fill:var(--green);
+}
+
+.node-report{
+    fill:var(--gray);
+}
+
+.node-selected{
+    fill:var(--red);
+}
+
+.node-label{
+    pointer-events:none;
+    font-size:12px;
+    fill:#20241f;
+    text-anchor:middle;
+}
+
+.forms{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    margin-top:18px;
+}
+
+.card{
+    padding:22px;
+}
+
+.card h3{
+    font-size:20px;
+    margin-bottom:8px;
+}
+
+.card p{
+    color:var(--muted);
+    font-size:14px;
+    margin-bottom:14px;
+}
+
+.status{
+    margin-top:12px;
+    color:var(--muted);
+    font-size:13px;
+}
+
+.status.good{
+    color:var(--green);
+}
+
+.status.bad{
+    color:var(--red);
+}
+
+.all-trees{
+    margin-top:26px;
+}
+
+.all-trees-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    margin-bottom:14px;
+}
+
+.all-trees-head h2{
+    font-size:26px;
+}
+
+.tree-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:16px;
+}
+
+.tree-tile{
+    background:white;
+    border:1px solid #e8ece4;
+    border-radius:18px;
+    box-shadow:0 10px 24px rgba(20,35,25,0.04);
+    padding:16px;
+    cursor:pointer;
+}
+
+.tree-tile:hover{
+    border-color:var(--green);
+}
+
+.tree-tile strong{
+    display:block;
+    margin-bottom:6px;
+}
+
+.tree-tile span{
+    color:var(--muted);
+    font-size:13px;
+    display:block;
+}
+
+.popup{
+    display:none;
+    position:fixed;
+    z-index:100;
+    inset:0;
+    background:rgba(0,0,0,0.22);
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+}
+
+.popup.show{
+    display:flex;
+}
+
+.popup-card{
+    background:white;
+    border-radius:22px;
+    box-shadow:0 24px 70px rgba(0,0,0,0.18);
+    max-width:520px;
+    width:100%;
+    padding:22px;
+}
+
+.popup-card h3{
+    font-size:22px;
+    margin-bottom:8px;
+}
+
+.popup-card p{
+    color:var(--muted);
+    font-size:14px;
+    margin-bottom:10px;
+}
+
+.popup-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin:14px 0;
+}
+
+.add-child{
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px solid #edf0e8;
+    display:none;
+}
+
+.add-child.show{
+    display:block;
+}
+
+.report-output{
+    display:none;
+    margin-top:18px;
+    padding:20px;
+}
+
+.report-output.show{
+    display:block;
+}
+
+pre{
+    white-space:pre-wrap;
+    word-break:break-word;
+    font-size:13px;
+    background:#fafbf8;
+    border:1px solid #edf0e8;
+    padding:14px;
+    border-radius:16px;
+    max-height:360px;
+    overflow:auto;
+}
+
+.footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    padding:30px 20px 60px;
+}
+
+@media(max-width:900px){
+    .nav-inner{
+        grid-template-columns:1fr;
+    }
+
+    .hero{
+        grid-template-columns:1fr;
+    }
+
+    .forms{
+        grid-template-columns:1fr;
+    }
+
+    #treeSvg{
+        min-width:640px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="nav">
+    <div class="nav-inner">
+        <div class="logo">TraceTree</div>
+
+        <div class="search-wrap">
+            <input id="treeSearch" type="text" placeholder="Search trees by title, creator, description, original link, or suspect ID">
+            <div id="searchResults" class="search-results"></div>
+        </div>
+
+        <button class="secondary" onclick="showAllTrees()">View All Trees</button>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="hero">
+        <div class="intro">
+            <h1>Trace<br>the<br>Original.</h1>
+            <p>
+                Create a root for original content. Report suspected pirating. Search existing trees and add new leaves to the correct branch.
+            </p>
+
+            <button onclick="focusCreate()">Create Root</button>
+            <button class="secondary" onclick="focusReport()">Report Pirating</button>
+
+            <div class="legend">
+                <span><i class="i-root"></i>Root</span>
+                <span><i class="i-report"></i>Report leaf</span>
+                <span><i class="i-selected"></i>Selected node</span>
+            </div>
+        </div>
+
+        <section class="workspace">
+            <div class="workspace-head">
+                <div>
+                    <h2 id="activeTitle">Simple tracing tree</h2>
+                    <p id="activeSubtitle">Search, create, or report to show an actual tree here.</p>
+                </div>
+
+                <button class="secondary small" onclick="clearSelection()">Clear</button>
+            </div>
+
+            <div class="tree-shell">
+                <svg id="treeSvg"></svg>
+            </div>
+        </section>
+    </section>
+
+    <section class="forms">
+        <div class="card" id="createCard">
+            <h3>Create Root</h3>
+            <p>Any user can create a root for a unique piece of content.</p>
+
+            <input id="rootTitle" type="text" placeholder="Title of the work">
+            <input id="rootLink" type="url" placeholder="Link to the original work">
+            <input id="rootCreator" type="text" placeholder="Original content creator ID">
+            <textarea id="rootDescription" placeholder="Optional timestamp / fingerprint / unique marker / short description"></textarea>
+
+            <button onclick="createRoot()">Create Root</button>
+            <div id="createStatus" class="status"></div>
+        </div>
+
+        <div class="card" id="reportCard">
+            <h3>Report Pirating</h3>
+            <p>
+                If the title or description matches an existing tree, the report is added there. If not, a new tree is created.
+            </p>
+
+            <input id="reportOriginalTitle" type="text" placeholder="Original work title">
+            <input id="reportOriginalLink" type="url" placeholder="Original work link or identifier">
+            <input id="reportOriginalCreator" type="text" placeholder="Original creator ID, if known">
+            <textarea id="reportOriginalDescription" placeholder="Original work description / unique timestamp / key identifying details"></textarea>
+            <input id="reportSuspect" type="text" placeholder="Suspect ID / suspected infringer">
+            <input id="reportPirateLink" type="url" placeholder="Link to suspected pirated content">
+            <textarea id="reportNote" placeholder="Notes: describe suspect, pirated video/image/article, similarities, timestamps, and anything useful"></textarea>
+
+            <button onclick="reportPirating()">Report Pirating</button>
+            <div id="reportStatus" class="status"></div>
+        </div>
+    </section>
+
+    <section class="all-trees">
+        <div class="all-trees-head">
+            <h2>Existing Trees</h2>
+            <div>
+                <button class="secondary small" onclick="downloadJSON()">Download JSON</button>
+                <button class="danger small" onclick="resetAll()">Clear All</button>
+            </div>
+        </div>
+
+        <div id="treeGrid" class="tree-grid"></div>
+    </section>
+
+    <section id="reportOutput" class="report-output">
+        <h3>Report Package</h3>
+        <pre id="reportText"></pre>
+        <br>
+        <button onclick="copyReport()">Copy Report</button>
+        <button class="secondary" onclick="downloadReport()">Download Report</button>
+    </section>
+
+</main>
+
+<div id="nodePopup" class="popup" onclick="closePopupOutside(event)">
+    <div class="popup-card">
+        <h3 id="popupTitle">Node</h3>
+        <p id="popupMeta"></p>
+        <p id="popupLink"></p>
+        <p id="popupNote"></p>
+
+        <div class="popup-actions">
+            <button onclick="upvoteSelected()">Upvote</button>
+            <button class="secondary" onclick="downvoteSelected()">Downvote</button>
+            <button class="secondary" onclick="toggleAddChild()">Add leaf from this node</button>
+            <button class="secondary" onclick="generateReportForActive()">Generate report</button>
+            <button class="danger" onclick="closePopup()">Close</button>
+        </div>
+
+        <div id="addChildBox" class="add-child">
+            <input id="childSuspect" type="text" placeholder="New suspect ID / account">
+            <input id="childPirateLink" type="url" placeholder="New suspected pirated link">
+            <textarea id="childNote" placeholder="Notes for this new leaf"></textarea>
+            <button onclick="addChildToSelected()">Add Leaf</button>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    TraceTree Prototype · Static Cloudflare Pages Version · Data saved locally in this browser
+</footer>
+
+<script>
+const STORAGE_KEY = "tracetree-working-v5";
+
+let state = {
+    trees: []
+};
+
+let activeTreeId = null;
+let activeNodeId = null;
+
+function id(){
+    return "id_" + Math.random().toString(36).slice(2) + "_" + Date.now().toString(36);
+}
+
+function clean(value){
+    return String(value || "").trim();
+}
+
+function lower(value){
+    return clean(value).toLowerCase();
+}
+
+function today(){
+    return new Date().toISOString().slice(0,10);
+}
+
+function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function load(){
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    if(saved){
+        try{
+            const parsed = JSON.parse(saved);
+
+            if(parsed && Array.isArray(parsed.trees)){
+                state = parsed;
+            }
+        }catch(error){
+            localStorage.removeItem(STORAGE_KEY);
+        }
+    }
+
+    renderAll();
+}
+
+function normalizeURL(url){
+    return lower(url)
+        .replace(/^https?:\/\//,"")
+        .replace(/^www\./,"")
+        .replace(/\/$/,"")
+        .split("?")[0]
+        .split("#")[0];
+}
+
+function words(text){
+    return lower(text)
+        .replace(/[^a-z0-9\u4e00-\u9fff]+/gi," ")
+        .split(/\s+/)
+        .filter(Boolean);
+}
+
+function jaccard(a,b){
+    const A = new Set(words(a));
+    const B = new Set(words(b));
+
+    if(A.size === 0 || B.size === 0){
+        return 0;
+    }
+
+    let hit = 0;
+
+    A.forEach(item => {
+        if(B.has(item)){
+            hit += 1;
+        }
+    });
+
+    return hit / Math.max(A.size, B.size);
+}
+
+function bigrams(text){
+    const compact = lower(text).replace(/\s+/g,"");
+
+    if(compact.length < 2){
+        return compact ? [compact] : [];
+    }
+
+    const result = [];
+
+    for(let i = 0; i < compact.length - 1; i++){
+        result.push(compact.slice(i, i + 2));
+    }
+
+    return result;
+}
+
+function dice(a,b){
+    const A = bigrams(a);
+    const B = bigrams(b);
+
+    if(A.length === 0 || B.length === 0){
+        return 0;
+    }
+
+    const counts = new Map();
+
+    A.forEach(x => counts.set(x, (counts.get(x) || 0) + 1));
+
+    let hit = 0;
+
+    B.forEach(x => {
+        const count = counts.get(x) || 0;
+
+        if(count > 0){
+            hit += 1;
+            counts.set(x, count - 1);
+        }
+    });
+
+    return (2 * hit) / (A.length + B.length);
+}
+
+function similarity(a,b){
+    return Math.max(jaccard(a,b), dice(a,b));
+}
+
+function treeText(tree){
+    const childText = flattenNodes(tree.children)
+        .map(node => `${node.suspect} ${node.pirateLink} ${node.note}`)
+        .join(" ");
+
+    return `${tree.title} ${tree.creator} ${tree.originalLink} ${tree.description} ${childText}`;
+}
+
+function matchTree(title, description, link){
+    const queryTitle = clean(title);
+    const queryDescription = clean(description);
+    const queryLink = normalizeURL(link);
+
+    let best = null;
+    let bestScore = 0;
+
+    for(const tree of state.trees){
+        const treeLink = normalizeURL(tree.originalLink);
+
+        if(queryLink && treeLink && queryLink === treeLink){
+            return {
+                tree,
+                score:1,
+                reason:"exact original link match"
+            };
+        }
+
+        const titleScore = similarity(queryTitle, tree.title);
+        const descScore = similarity(queryDescription, tree.description || "");
+        const combinedScore = similarity(`${queryTitle} ${queryDescription}`, `${tree.title} ${tree.description || ""}`);
+
+        const score = Math.max(titleScore, descScore, combinedScore);
+
+        if(score > bestScore){
+            bestScore = score;
+            best = tree;
+        }
+    }
+
+    if(best && bestScore >= 0.42){
+        return {
+            tree:best,
+            score:bestScore,
+            reason:"title or description match"
+        };
+    }
+
+    return null;
+}
+
+function createRoot(){
+    const title = clean(document.getElementById("rootTitle").value);
+    const link = clean(document.getElementById("rootLink").value);
+    const creator = clean(document.getElementById("rootCreator").value);
+    const description = clean(document.getElementById("rootDescription").value);
+    const status = document.getElementById("createStatus");
+
+    status.className = "status";
+
+    if(!title || !link || !creator){
+        status.textContent = "Please enter title, original link, and creator ID.";
+        status.classList.add("bad");
+        return;
+    }
+
+    const existing = matchTree(title, description, link);
+
+    if(existing){
+        activeTreeId = existing.tree.id;
+        status.textContent = `A matching tree already exists. Opened existing tree. Match reason: ${existing.reason}.`;
+        status.classList.add("bad");
+        clearCreateForm();
+        renderAll();
+        return;
+    }
+
+    const tree = {
+        id:id(),
+        title,
+        originalLink:link,
+        creator,
+        description:description || "No description provided.",
+        createdAt:today(),
+        votes:0,
+        children:[]
+    };
+
+    state.trees.unshift(tree);
+    activeTreeId = tree.id;
+    save();
+
+    status.textContent = "Root created. A new tracing tree is now visible.";
+    status.classList.add("good");
+
+    clearCreateForm();
+    renderAll();
+}
+
+function clearCreateForm(){
+    document.getElementById("rootTitle").value = "";
+    document.getElementById("rootLink").value = "";
+    document.getElementById("rootCreator").value = "";
+    document.getElementById("rootDescription").value = "";
+}
+
+function reportPirating(){
+    const title = clean(document.getElementById("reportOriginalTitle").value);
+    const link = clean(document.getElementById("reportOriginalLink").value);
+    const creator = clean(document.getElementById("reportOriginalCreator").value) || "Unknown creator";
+    const description = clean(document.getElementById("reportOriginalDescription").value);
+    const suspect = clean(document.getElementById("reportSuspect").value);
+    const pirateLink = clean(document.getElementById("reportPirateLink").value);
+    const note = clean(document.getElementById("reportNote").value);
+
+    const status = document.getElementById("reportStatus");
+    status.className = "status";
+
+    if(!title || !suspect || !pirateLink){
+        status.textContent = "Please enter original title, suspect ID, and suspected pirated link.";
+        status.classList.add("bad");
+        return;
+    }
+
+    const matched = matchTree(title, description, link);
+
+    let tree;
+    let createdNew = false;
+
+    if(matched){
+        tree = matched.tree;
+    }else{
+        tree = {
+            id:id(),
+            title,
+            originalLink:link || "No original link provided.",
+            creator,
+            description:description || "Created automatically from a piracy report.",
+            createdAt:today(),
+            votes:0,
+            children:[]
+        };
+
+        state.trees.unshift(tree);
+        createdNew = true;
+    }
+
+    tree.children.push({
+        id:id(),
+        type:"report",
+        suspect,
+        pirateLink,
+        note:note || "No notes provided.",
+        createdAt:today(),
+        votes:0,
+        children:[]
+    });
+
+    activeTreeId = tree.id;
+    save();
+
+    status.textContent = createdNew
+        ? "No title/description match was found. A new tree was created."
+        : `Matched existing tree. Report added to that tree. Match reason: ${matched.reason}.`;
+
+    status.classList.add("good");
+
+    clearReportForm();
+    renderAll();
+}
+
+function clearReportForm(){
+    document.getElementById("reportOriginalTitle").value = "";
+    document.getElementById("reportOriginalLink").value = "";
+    document.getElementById("reportOriginalCreator").value = "";
+    document.getElementById("reportOriginalDescription").value = "";
+    document.getElementById("reportSuspect").value = "";
+    document.getElementById("reportPirateLink").value = "";
+    document.getElementById("reportNote").value = "";
+}
+
+function flattenNodes(nodes){
+    const result = [];
+
+    function walk(list){
+        for(const node of list || []){
+            result.push(node);
+            walk(node.children || []);
+        }
+    }
+
+    walk(nodes);
+    return result;
+}
+
+function findTree(treeId){
+    return state.trees.find(tree => tree.id === treeId);
+}
+
+function findNode(tree, nodeId){
+    if(!tree){
+        return null;
+    }
+
+    if(tree.id === nodeId){
+        return tree;
+    }
+
+    const all = flattenNodes(tree.children);
+
+    return all.find(node => node.id === nodeId) || null;
+}
+
+function addChildToNode(tree, parentId, child){
+    if(tree.id === parentId){
+        tree.children.push(child);
+        return true;
+    }
+
+    const all = flattenNodes(tree.children);
+
+    for(const node of all){
+        if(node.id === parentId){
+            if(!node.children){
+                node.children = [];
+            }
+
+            node.children.push(child);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function renderAll(){
+    renderTree();
+    renderTreeGrid();
+    renderSearchResults();
+}
+
 function renderTree(){
     const svg = document.getElementById("treeSvg");
     const title = document.getElementById("activeTitle");
@@ -24,10 +1035,6 @@ function renderTree(){
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     svg.setAttribute("height", height);
 
-    /*
-       Draw relation lines first.
-       They must be placed before vertices so circles stay visible above lines.
-    */
     for(const edge of layout.edges){
         const line = document.createElementNS("http://www.w3.org/2000/svg","line");
 
@@ -35,17 +1042,11 @@ function renderTree(){
         line.setAttribute("y1", edge.y1);
         line.setAttribute("x2", edge.x2);
         line.setAttribute("y2", edge.y2);
-        line.setAttribute("stroke", "#bfc7bb");
-        line.setAttribute("stroke-width", "2");
-        line.setAttribute("stroke-linecap", "round");
-        line.setAttribute("opacity", "0.95");
+        line.setAttribute("class", "edge");
 
         svg.appendChild(line);
     }
 
-    /*
-       Draw vertices after the lines.
-    */
     for(const node of layout.nodes){
         const circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
 
@@ -80,6 +1081,58 @@ function renderTree(){
         svg.appendChild(voteText);
     }
 }
+
+function drawSampleTree(svg){
+    svg.setAttribute("viewBox","0 0 760 390");
+    svg.setAttribute("height","390");
+
+    const edges = [
+        [380,310,380,230],
+        [380,230,260,150],
+        [380,230,380,130],
+        [380,230,500,150],
+        [260,150,190,80],
+        [260,150,320,80],
+        [500,150,450,80],
+        [500,150,570,80]
+    ];
+
+    for(const edge of edges){
+        const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+
+        line.setAttribute("x1", edge[0]);
+        line.setAttribute("y1", edge[1]);
+        line.setAttribute("x2", edge[2]);
+        line.setAttribute("y2", edge[3]);
+        line.setAttribute("class", "sample-edge");
+
+        svg.appendChild(line);
+    }
+
+    const nodes = [
+        [380,310,20,"node-root"],
+        [380,230,16,"node-root"],
+        [260,150,16,"node-report"],
+        [380,130,16,"node-report"],
+        [500,150,16,"node-report"],
+        [190,80,14,"node-report"],
+        [320,80,14,"node-report"],
+        [450,80,14,"node-report"],
+        [570,80,14,"node-report"]
+    ];
+
+    for(const node of nodes){
+        const circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
+
+        circle.setAttribute("cx", node[0]);
+        circle.setAttribute("cy", node[1]);
+        circle.setAttribute("r", node[2]);
+        circle.setAttribute("class", `node-circle ${node[3]}`);
+
+        svg.appendChild(circle);
+    }
+}
+
 function computeLayout(tree){
     const levelGap = 110;
     const leafGap = 95;
@@ -90,10 +1143,6 @@ function computeLayout(tree){
     const edges = [];
     const nodeMap = new Map();
 
-    /*
-       First pass:
-       assign x/y positions to every node.
-    */
     function assignPosition(node, depth){
         const children = node.children || [];
 
@@ -131,10 +1180,6 @@ function computeLayout(tree){
         return positioned;
     }
 
-    /*
-       Second pass:
-       create parent-child edges after all coordinates are known.
-    */
     function assignEdges(parent){
         const parentPosition = nodeMap.get(parent.id);
 
@@ -166,3 +1211,349 @@ function computeLayout(tree){
         height: 80 + maxDepth * levelGap
     };
 }
+
+function getDepth(node){
+    if(!node.children || node.children.length === 0){
+        return 1;
+    }
+
+    return 1 + Math.max(...node.children.map(getDepth));
+}
+
+function shorten(text, length){
+    const value = String(text || "");
+
+    if(value.length <= length){
+        return value;
+    }
+
+    return value.slice(0, length - 1) + "…";
+}
+
+function renderTreeGrid(){
+    const grid = document.getElementById("treeGrid");
+    grid.innerHTML = "";
+
+    if(state.trees.length === 0){
+        grid.innerHTML = `<div class="tree-tile"><strong>No trees yet</strong><span>Create a root or report pirating to create the first tree.</span></div>`;
+        return;
+    }
+
+    for(const tree of state.trees){
+        const count = flattenNodes(tree.children).length;
+        const tile = document.createElement("div");
+        tile.className = "tree-tile";
+        tile.innerHTML = `
+            <strong>${escapeHTML(tree.title)}</strong>
+            <span>Creator: ${escapeHTML(tree.creator)}</span>
+            <span>Reports / leaves: ${count}</span>
+            <span>${escapeHTML(shorten(tree.description || "", 64))}</span>
+        `;
+        tile.addEventListener("click", () => {
+            activeTreeId = tree.id;
+            activeNodeId = null;
+            renderAll();
+            document.querySelector(".workspace").scrollIntoView({behavior:"smooth"});
+        });
+        grid.appendChild(tile);
+    }
+}
+
+function renderSearchResults(){
+    const input = document.getElementById("treeSearch");
+    const box = document.getElementById("searchResults");
+    const query = clean(input.value);
+
+    box.innerHTML = "";
+
+    if(!query){
+        box.classList.remove("show");
+        return;
+    }
+
+    const results = state.trees
+        .map(tree => ({
+            tree,
+            score: Math.max(
+                similarity(query, tree.title),
+                similarity(query, tree.creator),
+                similarity(query, tree.description || ""),
+                similarity(query, tree.originalLink),
+                similarity(query, treeText(tree))
+            )
+        }))
+        .filter(item => item.score >= 0.15 || lower(treeText(item.tree)).includes(lower(query)))
+        .sort((a,b) => b.score - a.score)
+        .slice(0,8);
+
+    if(results.length === 0){
+        box.innerHTML = `<div class="search-result"><strong>No matching tree</strong><span>Report Pirating will create a new tree if no title/description match exists.</span></div>`;
+        box.classList.add("show");
+        return;
+    }
+
+    for(const item of results){
+        const result = document.createElement("div");
+        result.className = "search-result";
+        result.innerHTML = `
+            <strong>${escapeHTML(item.tree.title)}</strong>
+            <span>Creator: ${escapeHTML(item.tree.creator)} · score: ${item.score.toFixed(2)}</span>
+            <span>${escapeHTML(shorten(item.tree.description || "", 90))}</span>
+        `;
+        result.addEventListener("click", () => {
+            activeTreeId = item.tree.id;
+            activeNodeId = null;
+            input.value = "";
+            box.classList.remove("show");
+            renderAll();
+        });
+        box.appendChild(result);
+    }
+
+    box.classList.add("show");
+}
+
+document.getElementById("treeSearch").addEventListener("input", renderSearchResults);
+
+document.addEventListener("click", function(event){
+    const wrap = document.querySelector(".search-wrap");
+
+    if(!wrap.contains(event.target)){
+        document.getElementById("searchResults").classList.remove("show");
+    }
+});
+
+function openNodePopup(nodeId){
+    const tree = findTree(activeTreeId);
+    const node = findNode(tree, nodeId);
+
+    if(!node){
+        return;
+    }
+
+    activeNodeId = nodeId;
+
+    document.getElementById("popupTitle").textContent = node.title || node.suspect || "Node";
+    document.getElementById("popupMeta").textContent = node.title
+        ? `Root · Creator: ${node.creator} · Created: ${node.createdAt} · Votes: ${node.votes || 0}`
+        : `Report leaf · Suspect: ${node.suspect} · Created: ${node.createdAt} · Votes: ${node.votes || 0}`;
+
+    document.getElementById("popupLink").innerHTML = node.title
+        ? `Original: <a href="${escapeAttribute(node.originalLink)}" target="_blank">${escapeHTML(node.originalLink)}</a>`
+        : `Pirated link: <a href="${escapeAttribute(node.pirateLink)}" target="_blank">${escapeHTML(node.pirateLink)}</a>`;
+
+    document.getElementById("popupNote").textContent = node.title
+        ? (node.description || "No description.")
+        : (node.note || "No note.");
+
+    document.getElementById("addChildBox").classList.remove("show");
+    document.getElementById("nodePopup").classList.add("show");
+
+    renderTree();
+}
+
+function closePopup(){
+    document.getElementById("nodePopup").classList.remove("show");
+    activeNodeId = null;
+    renderTree();
+}
+
+function closePopupOutside(event){
+    if(event.target.id === "nodePopup"){
+        closePopup();
+    }
+}
+
+function toggleAddChild(){
+    document.getElementById("addChildBox").classList.toggle("show");
+}
+
+function upvoteSelected(){
+    voteSelected(1);
+}
+
+function downvoteSelected(){
+    voteSelected(-1);
+}
+
+function voteSelected(delta){
+    const tree = findTree(activeTreeId);
+    const node = findNode(tree, activeNodeId);
+
+    if(!node){
+        return;
+    }
+
+    node.votes = Math.max(0, (node.votes || 0) + delta);
+    save();
+    openNodePopup(activeNodeId);
+    renderTreeGrid();
+}
+
+function addChildToSelected(){
+    const tree = findTree(activeTreeId);
+
+    if(!tree || !activeNodeId){
+        return;
+    }
+
+    const suspect = clean(document.getElementById("childSuspect").value);
+    const pirateLink = clean(document.getElementById("childPirateLink").value);
+    const note = clean(document.getElementById("childNote").value);
+
+    if(!suspect || !pirateLink){
+        alert("Please enter suspect ID and suspected pirated link.");
+        return;
+    }
+
+    addChildToNode(tree, activeNodeId, {
+        id:id(),
+        type:"report",
+        suspect,
+        pirateLink,
+        note:note || "No notes provided.",
+        createdAt:today(),
+        votes:0,
+        children:[]
+    });
+
+    save();
+
+    document.getElementById("childSuspect").value = "";
+    document.getElementById("childPirateLink").value = "";
+    document.getElementById("childNote").value = "";
+
+    openNodePopup(activeNodeId);
+    renderAll();
+}
+
+function generateReportForActive(){
+    const tree = findTree(activeTreeId);
+
+    if(!tree){
+        return;
+    }
+
+    const nodes = flattenNodes(tree.children);
+
+    const reportLines = nodes.map((node, index) => {
+        return [
+            `REPORT ${index + 1}`,
+            `Suspect: ${node.suspect}`,
+            `Pirated Link: ${node.pirateLink}`,
+            `Created: ${node.createdAt}`,
+            `Votes: ${node.votes || 0}`,
+            `Note: ${node.note || "None"}`
+        ].join("\n");
+    }).join("\n\n");
+
+    const text = [
+        "TRACE TREE REPORT PACKAGE",
+        "=========================",
+        "",
+        "ROOT",
+        "----",
+        `Title: ${tree.title}`,
+        `Creator: ${tree.creator}`,
+        `Original Link: ${tree.originalLink}`,
+        `Created: ${tree.createdAt}`,
+        `Description / Fingerprint: ${tree.description || "None"}`,
+        "",
+        "REPORTED PIRATING",
+        "-----------------",
+        reportLines || "No piracy reports yet.",
+        "",
+        "NEXT STEP",
+        "---------",
+        "Open the platform report page, paste this package, and attach screenshots if needed."
+    ].join("\n");
+
+    document.getElementById("reportText").textContent = text;
+    document.getElementById("reportOutput").classList.add("show");
+    document.getElementById("reportOutput").scrollIntoView({behavior:"smooth"});
+}
+
+function copyReport(){
+    const text = document.getElementById("reportText").textContent || "";
+
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Report copied.");
+    }).catch(() => {
+        alert("Copy failed. Select the report text manually.");
+    });
+}
+
+function downloadReport(){
+    const text = document.getElementById("reportText").textContent || "No report generated.";
+    downloadFile("tracetree-report.txt", text, "text/plain");
+}
+
+function downloadJSON(){
+    downloadFile("tracetree-data.json", JSON.stringify(state, null, 2), "application/json");
+}
+
+function downloadFile(filename, content, type){
+    const blob = new Blob([content], {type});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = filename;
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+}
+
+function resetAll(){
+    if(!confirm("Clear all locally saved TraceTree data?")){
+        return;
+    }
+
+    localStorage.removeItem(STORAGE_KEY);
+    state = {trees:[]};
+    activeTreeId = null;
+    activeNodeId = null;
+    renderAll();
+}
+
+function showAllTrees(){
+    document.querySelector(".all-trees").scrollIntoView({behavior:"smooth"});
+}
+
+function focusCreate(){
+    document.getElementById("createCard").scrollIntoView({behavior:"smooth"});
+    document.getElementById("rootTitle").focus();
+}
+
+function focusReport(){
+    document.getElementById("reportCard").scrollIntoView({behavior:"smooth"});
+    document.getElementById("reportOriginalTitle").focus();
+}
+
+function clearSelection(){
+    activeTreeId = null;
+    activeNodeId = null;
+    renderTree();
+}
+
+function escapeHTML(text){
+    return String(text || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+function escapeAttribute(text){
+    return escapeHTML(text).replaceAll("`","&#096;");
+}
+
+load();
+</script>
+
+</body>
+</html>
